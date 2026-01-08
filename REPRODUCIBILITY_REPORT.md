@@ -57,6 +57,77 @@ Small gaps in higher recall metrics (Recall@200: -1.64%, Recall@1000: -3.49%) ar
 2. **Small-Scale Test**: Validated pipeline on 10K documents before full run
 3. **Candidate Selection Test**: Measured FAISS IVF recall at different nprobe values
 4. **Model Architecture**: Confirmed C=32 vectors, 128-dimensional embeddings
+5. **Storage Analysis**: Measured actual storage requirements vs paper claims
+
+## Storage Analysis (Experiment 3)
+
+### Paper's Claims vs Our Measurements
+
+| Configuration | Paper Claim | Our Measurement | Ratio |
+|--------------|-------------|-----------------|-------|
+| ConstBERT32 (embeddings only) | 11 GB | **67.5 GB** | 6.1x |
+| ConstBERT32 (with index) | - | **272 GB** | - |
+
+### Theoretical Storage Calculation
+
+For 8,841,823 documents with C=32 vectors, dim=128:
+- Float32: 134.92 GB
+- Float16: 67.46 GB ← **Our embeddings**
+- Int8: 33.73 GB (still 3.1x paper's claim)
+- 4-bit: 16.87 GB (still 1.5x paper's claim)
+- **Paper: 11 GB** (requires aggressive quantization)
+
+### Our Storage Breakdown
+
+```
+Raw embeddings (float16):    67.5 GB  (verified: matches theoretical)
+FAISS IVF index (float32):  137.0 GB  (283M vectors for retrieval)
+Metadata (pickle):           67.5 GB  (doc IDs, config, redundant copy)
+────────────────────────────────────
+Total:                      272.0 GB
+```
+
+### Analysis
+
+**Why the 6.1x gap?**
+
+1. **Missing Quantization**: Public `pinecone/ConstBERT` on HuggingFace only available in float16
+   - Paper likely uses int8/4-bit/product quantization
+   - These optimized versions not released publicly
+
+2. **Different Measurement Scope**: Paper may report:
+   - Only compressed index (excluding source embeddings)
+   - Optimized PLAID binary format
+   - Post-quantization size only
+
+3. **FAISS Overhead**: Our FAISS IVF index stores:
+   - All 283M vectors in float32 for fast retrieval
+   - Clustering metadata (4096 centroids)
+   - Inverted lists structure
+
+### Impact on Reproducibility
+
+**Storage Efficiency Claims**:
+- Paper's main contribution: "50% of ColBERT storage (11 GB vs 22 GB)"
+- **Cannot reproduce**: Even theoretical int8 (34 GB) is 3x larger
+- **Reproducibility gap**: Missing quantization artifacts
+
+**Effectiveness Claims**:
+- ✅ Successfully reproduced (MRR@10 within 0.05%)
+- Storage and effectiveness are independent
+- Core algorithmic contribution validated
+
+### Recommendations
+
+**For Paper Authors**:
+1. Release quantized model versions (int8, 4-bit) on HuggingFace
+2. Document exact storage format and calculation methodology
+3. Provide compression/quantization code used in paper
+
+**For Reproducers**:
+- Document storage discrepancies clearly
+- Use theoretical calculations for fair comparison
+- Note that effectiveness reproduction is independent of storage
 
 ## Computational Resources
 
@@ -126,16 +197,21 @@ We successfully reproduced the core effectiveness claims of ConstBERT32:
 
 The use of FAISS IVF approximation is a reasonable engineering tradeoff that enables reproducibility research on large-scale datasets without access to specialized infrastructure. The primary contribution of ConstBERT (efficient multi-vector retrieval with fixed C vectors) is **successfully validated**.
 
-### Reproducibility Grade: **A- (Excellent with Minor Gaps)**
+### Reproducibility Grade: **B+ (Good with Significant Storage Gap)**
 
 **Justification**:
-- Primary metric (MRR@10) matched within 0.1%
-- Engineering tradeoffs are well-documented and justified
-- Mathematical correctness verified
-- Code and results available for verification
+- ✅ Primary metric (MRR@10) matched within 0.1%
+- ✅ Engineering tradeoffs well-documented and justified
+- ✅ Mathematical correctness verified
+- ❌ Storage claims not reproducible (6.1x gap, missing quantization)
+- ✅ Code and results available for verification
+
+**Overall**: Effectiveness claims successfully reproduced, but storage efficiency claims cannot be validated without missing artifacts.
 
 ---
 
 **Full Results**: [results/exp1_dev_results.json](results/exp1_dev_results.json)  
+**Storage Analysis**: [logs/exp3_storage_analysis.log](logs/exp3_storage_analysis.log)  
 **Implementation**: [experiments/exp1_dev_eval.py](experiments/exp1_dev_eval.py)  
-**Plan**: [PLAN.md](PLAN.md)
+**Plan**: [PLAN.md](PLAN.md)  
+**Issues**: [ISSUE_RETRIEVAL_STUCK.md](ISSUE_RETRIEVAL_STUCK.md)

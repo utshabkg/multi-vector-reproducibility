@@ -85,17 +85,43 @@
 - [ ] Compute NDCG@10
 - [ ] Compare with paper claims
 
-#### Experiment 3: Storage Analysis (TODO)
-**Claims to Verify:**
+#### Experiment 3: Storage Analysis ✅ COMPLETED
+**Target Claims:**
 - ConstBERT16: 5GB
 - ConstBERT32: 11GB (50% of ColBERT 22GB)
 - ConstBERT64: 20GB
 - ConstBERT128: 40GB
 
-**Tasks:**
-- [ ] Measure actual index size on disk
-- [ ] Verify linear scaling with C
-- [ ] Compare with ColBERT index (if available)
+**Our Measurements (ConstBERT32):**
+- Raw embeddings (float16): **67.5 GB**
+- FAISS IVF index: **137.0 GB**
+- Metadata: **67.5 GB**
+- **Total: 272 GB**
+
+**Findings:**
+- [x] Measure actual index size on disk
+- [x] Calculate theoretical storage for different dtypes
+- [x] Compare with paper claims
+- [x] Investigate public model format (see [logs/model_investigation.log](logs/model_investigation.log))
+- [x] Prepare author questions (see [AUTHOR_QUESTIONS.md](AUTHOR_QUESTIONS.md))
+
+**Key Insights:**
+- Public HuggingFace model: 109M parameters in float32, NO quantization
+- Model config has no quantization documentation
+- Embeddings are float16 only because we convert during inference
+- Paper's 11 GB requires quantization NOT available in public release
+- This is a **reproducibility artifact availability gap**
+- Embeddings alone (67.5 GB) are **6.1x larger** than paper's 11 GB claim
+- Paper likely uses aggressive quantization (int8/4-bit/product quantization)
+- Public HuggingFace model only available in float16
+- **Cannot reproduce storage efficiency claims** without quantized model
+
+**Impact:**
+- ✅ Effectiveness reproduced (MRR@10 -0.05%)
+- ❌ Storage claims not reproducible (6.1x gap)
+- Major gap in artifact availability
+
+See [logs/exp3_storage_analysis.log](logs/exp3_storage_analysis.log) and [ISSUE_RETRIEVAL_STUCK.md](ISSUE_RETRIEVAL_STUCK.md#issue-2).
 
 #### Experiment 4: Reranking Pipeline
 **Target Setup:** ESPLADE + ConstBERT32
