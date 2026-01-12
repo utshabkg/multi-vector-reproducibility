@@ -25,13 +25,17 @@ def compute_mrr(
     """
     reciprocal_ranks = []
     
-    for qid, results in run.items():
+    for qid, doc_results in run.items():
         if qid not in qrels or not qrels[qid]:
             continue
         
+        # Convert dict to sorted list if needed
+        if isinstance(doc_results, dict):
+            doc_results = sorted(doc_results.items(), key=lambda x: x[1], reverse=True)
+        
         relevant_docs = set(doc_id for doc_id, rel in qrels[qid].items() if rel > 0)
         
-        for rank, (doc_id, _) in enumerate(results[:k], 1):
+        for rank, (doc_id, _) in enumerate(doc_results[:k], 1):
             if doc_id in relevant_docs:
                 reciprocal_ranks.append(1.0 / rank)
                 break
@@ -59,15 +63,19 @@ def compute_recall(
     """
     recall_scores = []
     
-    for qid, results in run.items():
+    for qid, doc_results in run.items():
         if qid not in qrels or not qrels[qid]:
             continue
+        
+        # Convert dict to sorted list if needed
+        if isinstance(doc_results, dict):
+            doc_results = sorted(doc_results.items(), key=lambda x: x[1], reverse=True)
         
         relevant_docs = set(doc_id for doc_id, rel in qrels[qid].items() if rel > 0)
         if not relevant_docs:
             continue
         
-        retrieved_relevant = set(doc_id for doc_id, _ in results[:k]) & relevant_docs
+        retrieved_relevant = set(doc_id for doc_id, _ in doc_results[:k] if doc_id in relevant_docs)
         recall = len(retrieved_relevant) / len(relevant_docs)
         recall_scores.append(recall)
     
@@ -95,6 +103,10 @@ def compute_ndcg(
     for qid, results in run.items():
         if qid not in qrels or not qrels[qid]:
             continue
+        
+        # Convert dict to sorted list if needed
+        if isinstance(results, dict):
+            results = sorted(results.items(), key=lambda x: x[1], reverse=True)
         
         # DCG
         dcg = 0.0
@@ -130,13 +142,17 @@ def compute_precision(
     """
     precision_scores = []
     
-    for qid, results in run.items():
+    for qid, doc_results in run.items():
         if qid not in qrels or not qrels[qid]:
             continue
         
+        # Convert dict to sorted list if needed
+        if isinstance(doc_results, dict):
+            doc_results = sorted(doc_results.items(), key=lambda x: x[1], reverse=True)
+        
         relevant_docs = set(doc_id for doc_id, rel in qrels[qid].items() if rel > 0)
-        retrieved_relevant = sum(1 for doc_id, _ in results[:k] if doc_id in relevant_docs)
-        precision = retrieved_relevant / min(k, len(results))
+        retrieved_relevant = sum(1 for doc_id, _ in doc_results[:k] if doc_id in relevant_docs)
+        precision = retrieved_relevant / min(k, len(doc_results))
         precision_scores.append(precision)
     
     return np.mean(precision_scores) if precision_scores else 0.0
@@ -160,9 +176,13 @@ def compute_map(
     """
     ap_scores = []
     
-    for qid, results in run.items():
+    for qid, doc_results in run.items():
         if qid not in qrels or not qrels[qid]:
             continue
+        
+        # Convert dict to sorted list if needed
+        if isinstance(doc_results, dict):
+            doc_results = sorted(doc_results.items(), key=lambda x: x[1], reverse=True)
         
         relevant_docs = set(doc_id for doc_id, rel in qrels[qid].items() if rel > 0)
         if not relevant_docs:
@@ -171,7 +191,7 @@ def compute_map(
         num_relevant = 0
         sum_precisions = 0.0
         
-        for rank, (doc_id, _) in enumerate(results[:k], 1):
+        for rank, (doc_id, _) in enumerate(doc_results[:k], 1):
             if doc_id in relevant_docs:
                 num_relevant += 1
                 precision_at_rank = num_relevant / rank

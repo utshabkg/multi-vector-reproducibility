@@ -1,0 +1,50 @@
+{
+  "experiment": "ToT Zero-Shot Evaluation",
+  "dataset": {
+    "corpus_size": 6407814,
+    "num_queries": 622,
+    "avg_passage_length": 3063.273661033232
+  },
+  "model": {
+    "name": "pinecone/ConstBERT",
+    "C": 32,
+    "embedding_dim": 128
+  },
+  "retrieval": {
+    "method": "FAISS IVF + MaxSim",
+    "nlist": 4096,
+    "nprobe": 128,
+    "candidate_mult": 10,
+    "k": 1000
+  },
+  "metrics": {
+    "MRR@10": 0.04268042157913541,
+    "Recall@50": 0.11414790996784566,
+    "Recall@200": 0.1720257234726688,
+    "Recall@1000": 0.2572347266881029,
+    "NDCG@10": 0.048217164333040616,
+    "MAP@1000": 0.1779867828582697,
+    "Mean_Response_Time_ms": 715.9664581059643
+  },
+  "sample_queries": [
+    {
+      "query_id": "3000",
+      "query": "I remember this certain type of cheese from way back when I visited a region that bordered Switzerland, famous for its rolling hills and pastoral beauty. This cheese wasn't the superstar on the intern...",
+      "relevant_docs": 1,
+      "top_3_results": [
+        {
+          "doc_id": "41752340",
+          "score": 19.112905502319336
+        },
+        {
+          "doc_id": "72885444",
+          "score": 18.125425338745117
+        },
+        {
+          "doc_id": "9564421",
+          "score": 18.05634880065918
+        }
+      ]
+    }
+  ]
+}

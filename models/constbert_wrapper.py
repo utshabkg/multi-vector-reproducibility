@@ -20,7 +20,8 @@ class ConstBERTWrapper:
         self,
         model_name: str = "pinecone/ConstBERT",
         device: str = None,
-        batch_size: int = 32,
+        batch_size: int = 128,  # Increased default for 48GB VRAM
+        use_compile: bool = True,  # torch.compile for speed
     ):
         """
         Initialize ConstBERT model.
@@ -29,6 +30,7 @@ class ConstBERTWrapper:
             model_name: HuggingFace model identifier
             device: Device to run on ('cuda', 'cpu', or None for auto)
             batch_size: Batch size for encoding
+            use_compile: Whether to use torch.compile (PyTorch 2.0+)
         """
         if device is None:
             self.device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -44,12 +46,22 @@ class ConstBERTWrapper:
         ).to(self.device)
         self.model.eval()
         
+        # Compile model for faster inference (PyTorch 2.0+)
+        if use_compile and self.device == "cuda":
+            try:
+                print("Compiling model with torch.compile for faster inference...")
+                self.model = torch.compile(self.model, mode="max-autotune")
+                print("Model compiled successfully!")
+            except Exception as e:
+                print(f"torch.compile not available or failed: {e}")
+        
         self.batch_size = batch_size
         print(f"Model loaded successfully. Batch size: {batch_size}")
     
     def encode_queries(
         self,
         queries: List[str],
+        batch_size: int = None,
         show_progress: bool = True
     ) -> np.ndarray:
         """
@@ -63,14 +75,15 @@ class ConstBERTWrapper:
             numpy array of shape (num_queries, num_tokens, embedding_dim)
         """
         all_embeddings = []
+        bs = batch_size if batch_size is not None else self.batch_size
         
-        iterator = range(0, len(queries), self.batch_size)
+        iterator = range(0, len(queries), bs)
         if show_progress:
             iterator = tqdm(iterator, desc="Encoding queries")
         
         with torch.no_grad():
             for i in iterator:
-                batch = queries[i:i + self.batch_size]
+                batch = queries[i:i + bs]
                 embeddings = self.model.encode_queries(batch)
                 
                 if isinstance(embeddings, torch.Tensor):
@@ -83,6 +96,7 @@ class ConstBERTWrapper:
     def encode_documents(
         self,
         documents: List[str],
+        batch_size: int = None,
         show_progress: bool = True
     ) -> np.ndarray:
         """
@@ -97,14 +111,15 @@ class ConstBERTWrapper:
             where C is the fixed number of vectors per document (e.g., 32)
         """
         all_embeddings = []
+        bs = batch_size if batch_size is not None else self.batch_size
         
-        iterator = range(0, len(documents), self.batch_size)
+        iterator = range(0, len(documents), bs)
         if show_progress:
             iterator = tqdm(iterator, desc="Encoding documents")
         
         with torch.no_grad():
             for i in iterator:
-                batch = documents[i:i + self.batch_size]
+                batch = documents[i:i + bs]
                 embeddings = self.model.encode_documents(batch)
                 
                 if isinstance(embeddings, torch.Tensor):

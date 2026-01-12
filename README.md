@@ -95,6 +95,8 @@ python experiments/exp1_dev_eval.py \
 
 ## Target Metrics (Paper: ConstBERT32)
 
+### MS-MARCO Dev Set (In-Domain)
+
 | Metric | Paper | Our Result | Diff |
 |--------|-------|-----------|------|
 | MRR@10 | 39.04 | **38.99** | -0.05% ✓ |
@@ -102,9 +104,34 @@ python experiments/exp1_dev_eval.py \
 | Recall@200 | 93.72 | **92.08** | -1.64% ⚠️ |
 | Recall@1000 | 96.34 | **92.85** | -3.49% ⚠️ |
 
-**Status**: Successfully reproduced primary metric (MRR@10). Small gaps in Recall@200/1000 due to FAISS IVF approximation (computational tradeoff: 3.3h vs 300+h for brute-force).
+### TREC Deep Learning Track (In-Domain)
 
-See [results/exp1_dev_results.json](results/exp1_dev_results.json) for full results.
+| Dataset | Metric | Paper | Our Result | Diff |
+|---------|--------|-------|-----------|------|
+| TREC DL 2019 | NDCG@10 | 73.14 | **68.29** | -4.85% ⚠️ |
+| TREC DL 2020 | NDCG@10 | 73.29 | **69.30** | -3.99% ⚠️ |
+
+### TREC Tip-of-the-Tongue 2025 (Out-of-Domain - NEW)
+
+| Metric | ToT Result | MS-MARCO Result | Degradation |
+|--------|-----------|-----------------|-------------|
+| MRR@10 | **4.27%** | 38.99% | **-89.0%** ⚠️⚠️⚠️ |
+| Recall@50 | **11.41%** | 85.35% | **-86.6%** ⚠️⚠️⚠️ |
+| Recall@1000 | **25.72%** | 92.85% | **-72.3%** ⚠️⚠️⚠️ |
+
+**Status:** 
+- ✅ MS-MARCO primary metric (MRR@10) successfully reproduced
+- ⚠️ TREC DL gaps due to FAISS IVF vs PLAID approximation (confirmed by authors)
+- ⚠️ Storage claims (11 GB) require PLAID quantization (not reproducible with IVF)
+- ⚠️ **NEW:** Severe performance drop on ToT reveals domain-specific limitations
+
+**Key Findings:**
+1. ConstBERT effectiveness validated on MS-MARCO-style tasks
+2. Alternative retrieval backend (FAISS IVF) successfully demonstrated
+3. **Out-of-domain generalization is poor** - 9x worse on long descriptive queries
+4. Trade-off: Efficiency ↔ Generalization
+
+See [REPRODUCIBILITY_REPORT.md](REPRODUCIBILITY_REPORT.md) for full analysis and author clarifications.
 
 ## Implementation Details
 

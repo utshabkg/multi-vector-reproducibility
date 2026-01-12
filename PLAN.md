@@ -74,16 +74,29 @@
 - Index: `/media/12TB/shared/datasets/indices/constbert_msmarco_index.pkl`
 - Results: `./results/exp1_dev_results.json`
 
-#### Experiment 2: TREC Deep Learning Track (TODO)
+#### Experiment 2: TREC Deep Learning Track ✅ COMPLETED
 **Target Metrics:**
 - TREC DL 2019 NDCG@10: 73.14 (vs 74.64 ColBERT)
 - TREC DL 2020 NDCG@10: 73.29 (vs 73.99 ColBERT)
 
+**Our Results:**
+- TREC DL 2019 NDCG@10: **68.29%** (Paper: 73.14%, Diff: -4.85%) ⚠️
+- TREC DL 2020 NDCG@10: **69.30%** (Paper: 73.29%, Diff: -3.99%) ⚠️
+
 **Implementation:**
-- [ ] Locate TREC DL 2019/2020 queries
-- [ ] Run retrieval with same index from Exp 1
-- [ ] Compute NDCG@10
-- [ ] Compare with paper claims
+- [x] Downloaded TREC DL 2019/2020 queries (43 + 54 = 97 queries)
+- [x] Reused existing embeddings and index from Exp 1
+- [x] Ran retrieval with FAISS IVF (candidate_mult=10)
+- [x] Computed NDCG@10, MAP@1000, Recall metrics
+- [x] Compared with paper claims
+
+**Findings:**
+- NDCG@10 gaps (~4-5%) larger than MS-MARCO MRR gap (-0.05%)
+- Likely due to FAISS IVF approximation affecting ranking quality
+- TREC uses graded relevance (0-3) which is more sensitive to rank order
+- Runtime: ~90 seconds for 97 queries total
+
+See [results/exp2_trec_dl2019_results.json](results/exp2_trec_dl2019_results.json) and [results/exp2_trec_dl2020_results.json](results/exp2_trec_dl2020_results.json).
 
 #### Experiment 3: Storage Analysis ✅ COMPLETED
 **Target Claims:**
@@ -123,19 +136,49 @@
 
 See [logs/exp3_storage_analysis.log](logs/exp3_storage_analysis.log) and [ISSUE_RETRIEVAL_STUCK.md](ISSUE_RETRIEVAL_STUCK.md#issue-2).
 
-#### Experiment 4: Reranking Pipeline
-**Target Setup:** ESPLADE + ConstBERT32
+#### Experiment 4: PLAID Integration (HIGH PRIORITY)
+**Motivation:** Authors clarified that paper results use PLAID, not IVF. To properly reproduce, we need to test with PLAID.
+
+**Target Setup:** ConstBERT + PLAID retrieval algorithm
+**Claims to Reproduce:**
+- Storage: 11 GB (vs our 67.5 GB float16)
+- MS-MARCO MRR@10: 39.04% (exact match expected with PLAID)
+- Retrieval speed: ~100-200 ms/query (vs our 1.7s with IVF)
+
+**Implementation Plan:**
+- [ ] Locate and set up PLAID codebase (https://github.com/stanford-futuredata/plaid)
+- [ ] Integrate ConstBERT with PLAID quantization
+- [ ] Build PLAID index (with product quantization)
+- [ ] Run MS-MARCO Dev evaluation with PLAID
+- [ ] Compare PLAID vs IVF results:
+  - Effectiveness (MRR@10, Recall@k)
+  - Storage (11 GB vs 67.5 GB)
+  - Speed (ms/query)
+  - Trade-offs
+
+**Expected Outcome:**
+- Exact match of paper's 11 GB storage
+- Closer match to paper's effectiveness (no IVF approximation)
+- Validation of storage-efficiency claims
+
+**Status:** Not started - requires PLAID setup
+
+#### Experiment 5: Reranking Pipeline
+**Target Setup:** ESPLADE (first-stage) + ConstBERT32 (reranking)
 **Claims:**
 - Dev MRR: 39.52 (vs 39.99 PLAID)
 - MRT: 4.95ms (vs 51.25ms PLAID)
 - TREC19 NDCG@10: 74.38
 - TREC20 NDCG@10: 74.33
 
-**Implementation:**
+**Implementation Plan:**
 - [ ] Set up ESPLADE first-stage retrieval
 - [ ] Implement reranking with ConstBERT32
 - [ ] Measure latency and effectiveness
 - [ ] Compare with end-to-end PLAID
+- [ ] Analyze two-stage vs single-stage trade-offs
+
+**Status:** Not started - requires ESPLADE setup
 
 ### 1.5 Ablation Studies (Research Value)
 
@@ -168,12 +211,50 @@ See [logs/exp3_storage_analysis.log](logs/exp3_storage_analysis.log) and [ISSUE_
 - [ ] Optional: GPU experiments for comparison
 - [ ] Normalize latency measurements
 
-## Phase 2: ToT Dataset Evaluation (SECONDARY)
+## Phase 2: ToT Dataset Evaluation ✅ COMPLETED
 
-### 2.1 ToT Dataset Preparation
-- [ ] Locate ToT dataset path
-- [ ] Understand dataset structure and domain
-- [ ] Prepare queries and relevance judgments
+### 2.1 ToT Dataset Preparation ✅ COMPLETED
+- [x] Locate ToT dataset path
+- [x] Understand dataset structure and domain
+- [x] Prepare queries and relevance judgments
+
+**Dataset Location:** `/media/12TB/shared/datasets/raw/trec-tot-2025/`
+**Corpus:** 6.4M Wikipedia articles (vs 8.8M MS-MARCO passages)
+**Test Queries:** 622 (vs 6,980 MS-MARCO dev)
+**Query Style:** Long descriptive "tip-of-tongue" narratives vs short factoid queries
+
+### 2.2 Zero-Shot Evaluation ✅ COMPLETED
+**Research Question:** Does ConstBERT generalize to different query styles and corpora?
+
+**Our Results (TREC ToT 2025, 622 queries, 6.4M docs):**
+- MRR@10: **4.27%** (vs MS-MARCO 38.99%) - **9x worse** ⚠️⚠️⚠️
+- Recall@50: **11.41%** (vs MS-MARCO 85.35%) - **7.5x worse** ⚠️⚠️⚠️
+- Recall@200: 17.20% (vs MS-MARCO 92.08%)
+- Recall@1000: **25.72%** (vs MS-MARCO 92.85%) - **3.6x worse** ⚠️⚠️⚠️
+- NDCG@10: 4.82%
+- MAP@1000: 17.80%
+- Mean Response Time: 716 ms
+
+**Implementation:**
+- [x] Created ToT data loader (6.4M Wikipedia articles)
+- [x] Encoded corpus with optimized batch sizes (256, ~1.2 hours)
+- [x] Built FAISS IVF index (nlist=4096, nprobe=128)
+- [x] Evaluated on 622 test queries
+- [x] Computed standard IR metrics
+
+**Key Findings:**
+- ✅ **Critical Discovery:** ConstBERT shows severe performance degradation on ToT
+- ✅ Poor zero-shot transfer when query style differs (descriptive vs factoid)
+- ✅ Model is highly optimized for MS-MARCO, not general-purpose
+- ✅ This is an **important negative result** for the reproducibility study
+- ✅ Demonstrates trade-off: efficiency ↔ generalization
+
+**Storage Paths:**
+- Embeddings: `/media/12TB/shared/datasets/indices/trec-tot-2025/constbert_tot_faiss_index/embeddings.npy` (48.9 GB)
+- Index: `/media/12TB/shared/datasets/indices/trec-tot-2025/constbert_tot_faiss_index/index.faiss`
+- Results: `./results/exp4_tot_results.json`
+
+See [results/TOT_ANALYSIS.md](results/TOT_ANALYSIS.md) for detailed analysis.
 
 ### 2.2 Zero-Shot Evaluation
 **Research Questions:**
