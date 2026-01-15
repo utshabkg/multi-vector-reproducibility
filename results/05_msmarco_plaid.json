@@ -1,0 +1,24 @@
+{
+  "metrics": {
+    "mrr@10": 0.3000844248874335,
+    "recall@50": 0.7442215854823304,
+    "recall@200": 0.8393863419293219,
+    "recall@1000": 0.8763610315186247,
+    "map@1000": 0.34758494436911125
+  },
+  "config": {
+    "index": "constbert_plaid_index",
+    "k": 1000,
+    "ncells": 4,
+    "ndocs": 4096,
+    "centroid_score_threshold": 0.4
+  },
+  "timing": {
+    "total_time_s": 467.33497190475464,
+    "avg_time_ms": 66.9534343703087
+  },
+  "paper_comparison": {
+    "paper_mrr10": 0.3904,
+    "paper_recall1000": 0.9634
+  }
+}
