@@ -1,0 +1,53 @@
+{
+  "experiment": "ToT Fine-tuned Evaluation (TRAIN: 143 queries, TEST: 622 queries)",
+  "dataset": {
+    "corpus_size": 6407814,
+    "num_queries": 622,
+    "avg_passage_length": 3063.273661033232
+  },
+  "model": {
+    "name": "pinecone/ConstBERT (fine-tuned on ToT TRAIN)",
+    "base_model": "pinecone/ConstBERT",
+    "fine_tuned": true,
+    "training_data": "ToT TRAIN split (143 queries, 1,144 triples)",
+    "C": 32,
+    "embedding_dim": 128
+  },
+  "retrieval": {
+    "method": "FAISS IVF + MaxSim",
+    "nlist": 4096,
+    "nprobe": 128,
+    "candidate_mult": 10,
+    "k": 1000
+  },
+  "metrics": {
+    "MRR@10": 0.046496197621599546,
+    "Recall@50": 0.12540192926045016,
+    "Recall@200": 0.1752411575562701,
+    "Recall@1000": 0.2652733118971061,
+    "NDCG@10": 0.05142143369464104,
+    "MAP@1000": 0.18842607223691593,
+    "Mean_Response_Time_ms": 1057.6146890879443
+  },
+  "sample_queries": [
+    {
+      "query_id": "3000",
+      "query": "I remember this certain type of cheese from way back when I visited a region that bordered Switzerland, famous for its rolling hills and pastoral beauty. This cheese wasn't the superstar on the intern...",
+      "relevant_docs": 1,
+      "top_3_results": [
+        {
+          "doc_id": "41752340",
+          "score": 19.225811004638672
+        },
+        {
+          "doc_id": "72885444",
+          "score": 18.357563018798828
+        },
+        {
+          "doc_id": "9564421",
+          "score": 18.07846450805664
+        }
+      ]
+    }
+  ]
+}

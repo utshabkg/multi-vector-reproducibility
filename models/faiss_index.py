@@ -28,6 +28,7 @@ class ConstBERTFAISSIndex:
         self.embeddings = None  # (num_docs, C, dim)
         self.faiss_index = None
         self.use_gpu = use_gpu and faiss.get_num_gpus() > 0
+        self._num_docs = 0
         
     def add_documents(self, doc_ids: List[str], embeddings: np.ndarray):
         """
@@ -48,6 +49,7 @@ class ConstBERTFAISSIndex:
         
         # Build FAISS index on flattened vectors for fast candidate retrieval
         num_docs, C, dim = self.embeddings.shape
+        self._num_docs = num_docs
         flat_embeddings = self.embeddings.reshape(num_docs * C, dim).astype('float32')
         
         print(f"Building FAISS index for {num_docs} documents...")
@@ -194,6 +196,11 @@ class ConstBERTFAISSIndex:
             }, f)
         
         print(f"Index saved: {len(self.doc_ids)} documents")
+
+    @property
+    def num_docs(self) -> int:
+        """Number of documents indexed."""
+        return self._num_docs if self._num_docs else len(self.doc_ids)
     
     @classmethod
     def load(cls, input_path: str):
