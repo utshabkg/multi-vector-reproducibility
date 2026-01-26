@@ -1,5 +1,5 @@
 {
-  "experiment": "ToT Fine-tuned Evaluation (TRAIN: 143 queries, TEST: 622 queries)",
+  "experiment": "ToT Fine-tuned Evaluation (split=test)",
   "dataset": {
     "corpus_size": 6407814,
     "num_queries": 622,
@@ -26,8 +26,8 @@
     "Recall@200": 0.1752411575562701,
     "Recall@1000": 0.2652733118971061,
     "NDCG@10": 0.05142143369464104,
-    "MAP@1000": 0.18842607223691593,
-    "Mean_Response_Time_ms": 1057.6146890879443
+    "MAP@1000": 0.18843167874826394,
+    "Mean_Response_Time_ms": 673.971189946607
   },
   "sample_queries": [
     {
@@ -37,15 +37,15 @@
       "top_3_results": [
         {
           "doc_id": "41752340",
-          "score": 19.225811004638672
+          "score": 19.226877212524414
         },
         {
           "doc_id": "72885444",
-          "score": 18.357563018798828
+          "score": 18.358455657958984
         },
         {
           "doc_id": "9564421",
-          "score": 18.07846450805664
+          "score": 18.07836151123047
         }
       ]
     }

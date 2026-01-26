@@ -51,13 +51,18 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--test", action="store_true",
                         help="Run a fast test using a small subset of documents/queries")
+    parser.add_argument("--splits", nargs='+', default=["test"],
+                        choices=["test", "dev1", "dev2", "dev3"],
+                        help="Which split(s) to evaluate: test and/or dev1/dev2/dev3")
     args = parser.parse_args()
     # Paths - all stored together in index directory
     index_dir = Path("/media/12TB/shared/datasets/indices/trec-tot-2025/constbert_tot_faiss_index")
     embeddings_path = index_dir / "embeddings.npy"
     metadata_path = index_dir / "metadata.npy"
     index_path = index_dir / "index"
-    results_path = project_root / "results" / "exp4_tot_results.json"
+    # Results filename depends on chosen split to avoid overwriting
+    split = 'test' if not hasattr(args, 'split') else args.split
+    results_path = project_root / "results" / f"10_finetune_tot_{split}.json"
     
     # Create directories
     index_dir.mkdir(parents=True, exist_ok=True)
@@ -77,19 +82,9 @@ def main():
     logger.info(f"  Corpus: {stats['total_documents']:,} Wikipedia articles")
     logger.info(f"  Average passage length: {stats['avg_passage_length']:.0f} characters")
     
-    # Load test split
-    test_queries = loader.load_queries("test")
-    test_qrels = loader.load_qrels("test")
-    logger.info(f"  Test queries: {len(test_queries)}")
-    logger.info(f"  Queries with relevance judgments: {len(test_qrels)}")
-    
-    # Show sample query
-    sample_qid = list(test_queries.keys())[0]
-    sample_query = test_queries[sample_qid]
-    logger.info(f"\n  Sample query (ID {sample_qid}):")
-    logger.info(f"  '{sample_query[:150]}...'")
-    logger.info(f"  Length: {len(sample_query)} chars")
-    logger.info(f"  Relevant docs: {len(test_qrels[sample_qid])}")
+    # Splits to evaluate (we'll load queries per-split later)
+    splits = args.splits
+    logger.info(f"  Splits to evaluate: {splits}")
     
     # Check if embeddings exist
     if Path(embeddings_path).exists() and Path(metadata_path).exists():
@@ -206,24 +201,18 @@ def main():
             faiss_size = Path(f"{index_path}.faiss").stat().st_size / (1024**3)
             logger.info(f"  Storage: {pkl_size:.2f} GB (metadata) + {faiss_size:.2f} GB (FAISS index)")
     
-    # Run retrieval
-    logger.info("\n[4/5] Running retrieval on 622 test queries...")
-    logger.info("  Using FAISS IVF with candidate_mult=10 for high accuracy")
-    
-    # Initialize FINE-TUNED model for query encoding
+    # Initialize FINE-TUNED model once for query encoding (used for all splits)
     device = "cuda" if torch.cuda.is_available() else "cpu"
-    
-    # Load base model then fine-tuned weights
     from transformers import AutoModel
     from safetensors.torch import load_file
-    
+
     base_model = AutoModel.from_pretrained('pinecone/ConstBERT', trust_remote_code=True)
     checkpoint_path = Path('checkpoints/constbert_tot_finetuned/model.safetensors')
     if checkpoint_path.exists():
         logger.info(f"  ✅ Loading fine-tuned weights from {checkpoint_path}")
         state_dict = load_file(str(checkpoint_path))
         base_model.load_state_dict(state_dict, strict=False)
-    
+
     model = ConstBERTWrapper.__new__(ConstBERTWrapper)
     model.model = base_model
     model.device = device
@@ -231,129 +220,145 @@ def main():
     model.model.eval()
     model.batch_size = 128
     model.tokenizer = base_model.query_tokenizer
-    
-    # Encode queries
-    logger.info("  Encoding queries...")
-    query_ids = list(test_queries.keys())
-    query_texts = [test_queries[qid] for qid in query_ids]
-    query_embeddings = model.encode_queries(query_texts, batch_size=128, show_progress=True)
-    
-    # Retrieve
-    logger.info("  Retrieving top-1000 documents per query...")
-    all_results = {}
-    query_times = []
-    
-    for i, qid in enumerate(tqdm(query_ids, desc="Retrieving")):
-        start_time = time.time()
-        
-        # Retrieve (returns doc_id lists and score lists)
-        doc_lists, score_lists = index.search(
-            query_embeddings[i:i+1],
-            k=1000,
-            candidate_mult=10  # Higher for better accuracy
-        )
-        results = list(zip(doc_lists[0], score_lists[0]))
-        
-        query_time = time.time() - start_time
-        query_times.append(query_time)
-        
-        # Store results as {doc_id: score}
-        all_results[qid] = {doc_id: float(score) for doc_id, score in results}
-    
-    # Compute metrics
-    logger.info("\n[5/5] Computing evaluation metrics...")
-    
-    # MRR@10
-    mrr_10 = compute_mrr(all_results, test_qrels, k=10)
-    logger.info(f"  MRR@10: {mrr_10*100:.2f}%")
-    
-    # Recall@k
-    recall_50 = compute_recall(all_results, test_qrels, k=50)
-    recall_200 = compute_recall(all_results, test_qrels, k=200)
-    recall_1000 = compute_recall(all_results, test_qrels, k=1000)
-    logger.info(f"  Recall@50: {recall_50*100:.2f}%")
-    logger.info(f"  Recall@200: {recall_200*100:.2f}%")
-    logger.info(f"  Recall@1000: {recall_1000*100:.2f}%")
-    
-    # NDCG@10
-    ndcg_10 = compute_ndcg(all_results, test_qrels, k=10)
-    logger.info(f"  NDCG@10: {ndcg_10*100:.2f}%")
-    
-    # MAP@1000
-    map_1000 = compute_map(all_results, test_qrels, k=1000)
-    logger.info(f"  MAP@1000: {map_1000*100:.2f}%")
-    
-    # Mean response time
-    mean_rt = np.mean(query_times) * 1000  # ms
-    logger.info(f"  Mean Response Time: {mean_rt:.0f} ms")
-    
-    # Save results
-    results = {
-        "experiment": "ToT Fine-tuned Evaluation (TRAIN: 143 queries, TEST: 622 queries)",
-        "dataset": {
-            "corpus_size": stats['total_documents'],
-            "num_queries": len(test_queries),
-            "avg_passage_length": stats['avg_passage_length']
-        },
-        "model": {
-            "name": "pinecone/ConstBERT (fine-tuned on ToT TRAIN)",
-            "base_model": "pinecone/ConstBERT",
-            "fine_tuned": True,
-            "training_data": "ToT TRAIN split (143 queries, 1,144 triples)",
-            "C": 32,
-            "embedding_dim": 128
-        },
-        "retrieval": {
-            "method": "FAISS IVF + MaxSim",
-            "nlist": 4096,
-            "nprobe": 128,
-            "candidate_mult": 10,
-            "k": 1000
-        },
-        "metrics": {
-            "MRR@10": float(mrr_10),
-            "Recall@50": float(recall_50),
-            "Recall@200": float(recall_200),
-            "Recall@1000": float(recall_1000),
-            "NDCG@10": float(ndcg_10),
-            "MAP@1000": float(map_1000),
-            "Mean_Response_Time_ms": float(mean_rt)
-        },
-        "sample_queries": [
-            {
-                "query_id": sample_qid,
-                "query": test_queries[sample_qid][:200] + "...",
-                "relevant_docs": len(test_qrels[sample_qid]),
-                "top_3_results": [
-                    {"doc_id": doc_id, "score": float(score)}
-                    for doc_id, score in list(all_results[sample_qid].items())[:3]
-                ]
-            }
-        ]
-    }
-    
-    with open(results_path, 'w') as f:
-        json.dump(results, f, indent=2)
-    
-    logger.info(f"\n{'='*80}")
-    logger.info(f"Results saved to {results_path}")
-    logger.info(f"{'='*80}")
-    
-    # Summary
-    logger.info("\n=== EXPERIMENT COMPLETE ===")
-    logger.info(f"ToT Test Set (622 queries):")
-    logger.info(f"  MRR@10: {mrr_10*100:.2f}%")
-    logger.info(f"  Recall@1000: {recall_1000*100:.2f}%")
-    logger.info(f"  NDCG@10: {ndcg_10*100:.2f}%")
-    logger.info(f"  Mean Response Time: {mean_rt:.0f} ms")
-    logger.info("\nFine-tuned model will be compared with base ConstBERT for improvement analysis.")
 
-    # Test mode: use a small subset to speed up development/debugging
-    if args.test:
-        subset_docs = min(10000, embeddings.shape[0])
-        logger.info(f"  TEST MODE: truncating embeddings and doc_ids to first {subset_docs} documents")
-        embeddings = embeddings[:subset_docs]
-        doc_ids = doc_ids[:subset_docs]
+    # Evaluate each requested split (embeddings/index already loaded)
+    for split in splits:
+        logger.info(f"\n[4/5] Running retrieval for split='{split}' ({len(loader.load_queries(split))} queries)...")
+        logger.info("  Using FAISS IVF with candidate_mult=10 for high accuracy")
+
+        # Load queries/qrels for this split
+        test_queries = loader.load_queries(split)
+        test_qrels = loader.load_qrels(split)
+
+        # Show sample query
+        sample_qid = list(test_queries.keys())[0]
+        sample_query = test_queries[sample_qid]
+        logger.info(f"\n  Sample query (ID {sample_qid}):")
+        logger.info(f"  '{sample_query[:150]}...'")
+        logger.info(f"  Length: {len(sample_query)} chars")
+        logger.info(f"  Relevant docs: {len(test_qrels[sample_qid])}")
+
+        # Encode queries
+        logger.info("  Encoding queries...")
+        query_ids = list(test_queries.keys())
+        query_texts = [test_queries[qid] for qid in query_ids]
+        query_embeddings = model.encode_queries(query_texts, batch_size=128, show_progress=True)
+
+        # Retrieve
+        logger.info("  Retrieving top-1000 documents per query...")
+        all_results = {}
+        query_times = []
+
+        for i, qid in enumerate(tqdm(query_ids, desc=f"Retrieving-{split}")):
+            start_time = time.time()
+
+            # Retrieve (returns doc_id lists and score lists)
+            doc_lists, score_lists = index.search(
+                query_embeddings[i:i+1],
+                k=1000,
+                candidate_mult=10  # Higher for better accuracy
+            )
+            results = list(zip(doc_lists[0], score_lists[0]))
+
+            query_time = time.time() - start_time
+            query_times.append(query_time)
+
+            # Store results as {doc_id: score}
+            all_results[qid] = {doc_id: float(score) for doc_id, score in results}
+        
+        # Compute metrics for this split
+        logger.info("\n[5/5] Computing evaluation metrics...")
+
+        # MRR@10
+        mrr_10 = compute_mrr(all_results, test_qrels, k=10)
+        logger.info(f"  MRR@10: {mrr_10*100:.2f}%")
+
+        # Recall@k
+        recall_50 = compute_recall(all_results, test_qrels, k=50)
+        recall_200 = compute_recall(all_results, test_qrels, k=200)
+        recall_1000 = compute_recall(all_results, test_qrels, k=1000)
+        logger.info(f"  Recall@50: {recall_50*100:.2f}%")
+        logger.info(f"  Recall@200: {recall_200*100:.2f}%")
+        logger.info(f"  Recall@1000: {recall_1000*100:.2f}%")
+
+        # NDCG@10
+        ndcg_10 = compute_ndcg(all_results, test_qrels, k=10)
+        logger.info(f"  NDCG@10: {ndcg_10*100:.2f}%")
+
+        # MAP@1000
+        map_1000 = compute_map(all_results, test_qrels, k=1000)
+        logger.info(f"  MAP@1000: {map_1000*100:.2f}%")
+
+        # Mean response time
+        mean_rt = np.mean(query_times) * 1000  # ms
+        logger.info(f"  Mean Response Time: {mean_rt:.0f} ms")
+
+        # Save results (split-specific filename)
+        split_results_path = project_root / "results" / f"finetune-results_tot_{split}.json"
+        split_results_path.parent.mkdir(parents=True, exist_ok=True)
+
+        results = {
+            "experiment": f"ToT Fine-tuned Evaluation (split={split})",
+            "dataset": {
+                "corpus_size": stats['total_documents'],
+                "num_queries": len(test_queries),
+                "avg_passage_length": stats['avg_passage_length']
+            },
+            "model": {
+                "name": "pinecone/ConstBERT (fine-tuned on ToT TRAIN)",
+                "base_model": "pinecone/ConstBERT",
+                "fine_tuned": True,
+                "training_data": "ToT TRAIN split (143 queries, 1,144 triples)",
+                "C": 32,
+                "embedding_dim": 128
+            },
+            "retrieval": {
+                "method": "FAISS IVF + MaxSim",
+                "nlist": 4096,
+                "nprobe": 128,
+                "candidate_mult": 10,
+                "k": 1000
+            },
+            "metrics": {
+                "MRR@10": float(mrr_10),
+                "Recall@50": float(recall_50),
+                "Recall@200": float(recall_200),
+                "Recall@1000": float(recall_1000),
+                "NDCG@10": float(ndcg_10),
+                "MAP@1000": float(map_1000),
+                "Mean_Response_Time_ms": float(mean_rt)
+            },
+            "sample_queries": [
+                {
+                    "query_id": sample_qid,
+                    "query": test_queries[sample_qid][:200] + "...",
+                    "relevant_docs": len(test_qrels[sample_qid]),
+                    "top_3_results": [
+                        {"doc_id": doc_id, "score": float(score)}
+                        for doc_id, score in list(all_results[sample_qid].items())[:3]
+                    ]
+                }
+            ]
+        }
+
+        with open(split_results_path, 'w') as f:
+            json.dump(results, f, indent=2)
+
+        logger.info(f"\n{'='*80}")
+        logger.info(f"Results saved to {split_results_path}")
+        logger.info(f"{'='*80}")
+
+        # Summary
+        logger.info("\n=== SPLIT COMPLETE ===")
+        logger.info(f"ToT {split.upper()} Set ({len(test_queries)} queries):")
+        logger.info(f"  MRR@10: {mrr_10*100:.2f}%")
+        logger.info(f"  Recall@1000: {recall_1000*100:.2f}%")
+        logger.info(f"  NDCG@10: {ndcg_10*100:.2f}%")
+        logger.info(f"  Mean Response Time: {mean_rt:.0f} ms")
+        logger.info("\nFine-tuned model will be compared with base ConstBERT for improvement analysis.")
+    
+
+    
 
 if __name__ == "__main__":
     main()

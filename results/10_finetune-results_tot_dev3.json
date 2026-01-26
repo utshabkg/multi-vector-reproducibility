@@ -1,0 +1,53 @@
+{
+  "experiment": "ToT Fine-tuned Evaluation (split=dev3)",
+  "dataset": {
+    "corpus_size": 6407814,
+    "num_queries": 536,
+    "avg_passage_length": 3063.273661033232
+  },
+  "model": {
+    "name": "pinecone/ConstBERT (fine-tuned on ToT TRAIN)",
+    "base_model": "pinecone/ConstBERT",
+    "fine_tuned": true,
+    "training_data": "ToT TRAIN split (143 queries, 1,144 triples)",
+    "C": 32,
+    "embedding_dim": 128
+  },
+  "retrieval": {
+    "method": "FAISS IVF + MaxSim",
+    "nlist": 4096,
+    "nprobe": 128,
+    "candidate_mult": 10,
+    "k": 1000
+  },
+  "metrics": {
+    "MRR@10": 0.023694029850746267,
+    "Recall@50": 0.07462686567164178,
+    "Recall@200": 0.10820895522388059,
+    "Recall@1000": 0.17723880597014927,
+    "NDCG@10": 0.02653447724764979,
+    "MAP@1000": 0.1471782852104917,
+    "Mean_Response_Time_ms": 687.7443501308783
+  },
+  "sample_queries": [
+    {
+      "query_id": "2001",
+      "query": "I remember this old building I used to pass by in the heart of a bustling financial district, a place where the air always seemed thick with the scent of ambition and old money. The building itself wa...",
+      "relevant_docs": 1,
+      "top_3_results": [
+        {
+          "doc_id": "41787077",
+          "score": 14.623095512390137
+        },
+        {
+          "doc_id": "66183245",
+          "score": 14.391401290893555
+        },
+        {
+          "doc_id": "40074145",
+          "score": 14.037696838378906
+        }
+      ]
+    }
+  ]
+}

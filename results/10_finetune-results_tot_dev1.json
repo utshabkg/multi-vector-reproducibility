@@ -1,0 +1,53 @@
+{
+  "experiment": "ToT Fine-tuned Evaluation (split=dev1)",
+  "dataset": {
+    "corpus_size": 6407814,
+    "num_queries": 142,
+    "avg_passage_length": 3063.273661033232
+  },
+  "model": {
+    "name": "pinecone/ConstBERT (fine-tuned on ToT TRAIN)",
+    "base_model": "pinecone/ConstBERT",
+    "fine_tuned": true,
+    "training_data": "ToT TRAIN split (143 queries, 1,144 triples)",
+    "C": 32,
+    "embedding_dim": 128
+  },
+  "retrieval": {
+    "method": "FAISS IVF + MaxSim",
+    "nlist": 4096,
+    "nprobe": 128,
+    "candidate_mult": 10,
+    "k": 1000
+  },
+  "metrics": {
+    "MRR@10": 0.01584507042253521,
+    "Recall@50": 0.04929577464788732,
+    "Recall@200": 0.1056338028169014,
+    "Recall@1000": 0.16901408450704225,
+    "NDCG@10": 0.017117440549812627,
+    "MAP@1000": 0.10586771008886943,
+    "Mean_Response_Time_ms": 701.6993072670949
+  },
+  "sample_queries": [
+    {
+      "query_id": "152",
+      "query": "Foriegn Film about 3 Strangers in an Apartment .\n Movie from  the early 2000s I believe about three people living in an apartment but never running into each other. One woman and two men are in the ap...",
+      "relevant_docs": 1,
+      "top_3_results": [
+        {
+          "doc_id": "74838815",
+          "score": 16.621315002441406
+        },
+        {
+          "doc_id": "63434210",
+          "score": 16.587268829345703
+        },
+        {
+          "doc_id": "50914768",
+          "score": 16.414588928222656
+        }
+      ]
+    }
+  ]
+}

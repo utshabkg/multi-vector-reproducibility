@@ -1,0 +1,53 @@
+{
+  "experiment": "ToT Fine-tuned Evaluation (split=dev2)",
+  "dataset": {
+    "corpus_size": 6407814,
+    "num_queries": 143,
+    "avg_passage_length": 3063.273661033232
+  },
+  "model": {
+    "name": "pinecone/ConstBERT (fine-tuned on ToT TRAIN)",
+    "base_model": "pinecone/ConstBERT",
+    "fine_tuned": true,
+    "training_data": "ToT TRAIN split (143 queries, 1,144 triples)",
+    "C": 32,
+    "embedding_dim": 128
+  },
+  "retrieval": {
+    "method": "FAISS IVF + MaxSim",
+    "nlist": 4096,
+    "nprobe": 128,
+    "candidate_mult": 10,
+    "k": 1000
+  },
+  "metrics": {
+    "MRR@10": 0.005738705738705738,
+    "Recall@50": 0.06993006993006994,
+    "Recall@200": 0.1258741258741259,
+    "Recall@1000": 0.1888111888111888,
+    "NDCG@10": 0.012337595318702236,
+    "MAP@1000": 0.041850531019274884,
+    "Mean_Response_Time_ms": 705.3523030314412
+  },
+  "sample_queries": [
+    {
+      "query_id": "519",
+      "query": "redbox mystery driving me insane .\n Ok, so my hubby, brother-in-law, and I rented a movie from redbox in the mid 2000\u2019s (around the time streaming was becoming big) and I gotta say, we were glad we on...",
+      "relevant_docs": 1,
+      "top_3_results": [
+        {
+          "doc_id": "68836666",
+          "score": 13.971382141113281
+        },
+        {
+          "doc_id": "72922584",
+          "score": 13.78370475769043
+        },
+        {
+          "doc_id": "59405056",
+          "score": 13.655113220214844
+        }
+      ]
+    }
+  ]
+}
