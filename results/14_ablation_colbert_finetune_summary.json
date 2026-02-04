@@ -1,0 +1,36 @@
+{
+  "experiment": "colbert_ablation_finetuning",
+  "training_data": "TRAIN+DEV1+DEV2 (428 queries)",
+  "validation": "DEV3 (early stopping)",
+  "test": "TEST",
+  "baseline_mrr@10": 0.6143055555555555,
+  "seeds": [
+    42,
+    123,
+    456
+  ],
+  "results": [
+    {
+      "seed": 42,
+      "best_dev3_mrr": 0.618079365079365,
+      "best_step": 200,
+      "test_mrr@10": 0.5179126984126985
+    },
+    {
+      "seed": 123,
+      "best_dev3_mrr": 0.6199444444444444,
+      "best_step": 200,
+      "test_mrr@10": 0.5166904761904763
+    },
+    {
+      "seed": 456,
+      "best_dev3_mrr": 0.6175793650793651,
+      "best_step": 100,
+      "test_mrr@10": 0.5170674603174603
+    }
+  ],
+  "mean_mrr@10": 0.5172235449735451,
+  "std_mrr@10": 0.0005110307264227698,
+  "delta_vs_baseline": -0.09708201058201049,
+  "delta_pct": -15.803537784093955
+}

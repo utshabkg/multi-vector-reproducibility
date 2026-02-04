@@ -1,0 +1,36 @@
+{
+  "experiment": "ablation_finetuning",
+  "training_data": "TRAIN+DEV1+DEV2 (428 queries)",
+  "validation": "DEV3 (early stopping)",
+  "test": "TEST",
+  "baseline_mrr@10": 0.593079365079365,
+  "seeds": [
+    42,
+    123,
+    456
+  ],
+  "results": [
+    {
+      "seed": 123,
+      "best_dev3_mrr": 0.5993571428571428,
+      "best_step": 100,
+      "test_mrr@10": 0.47887301587301595
+    },
+    {
+      "seed": 42,
+      "best_dev3_mrr": 0.5984999999999999,
+      "best_step": 100,
+      "test_mrr@10": 0.49194047619047615
+    },
+    {
+      "seed": 456,
+      "best_dev3_mrr": 0.5980238095238095,
+      "best_step": 100,
+      "test_mrr@10": 0.5013174603174604
+    }
+  ],
+  "mean_mrr@10": 0.4907103174603175,
+  "std_mrr@10": 0.009204101965282556,
+  "delta_vs_baseline": -0.10236904761904747,
+  "delta_pct": -17.26059843699816
+}
