@@ -411,10 +411,21 @@ def main():
                        help='Maximum training steps')
     parser.add_argument('--warmup_steps', type=int, default=500,
                        help='Warmup steps')
+    parser.add_argument('--seed', type=int, default=42,
+                       help='Random seed for reproducibility')
     parser.add_argument('--test_mode', action='store_true',
                        help='Test mode with limited data')
     
     args = parser.parse_args()
+    
+    # Set random seeds for reproducibility
+    import random
+    random.seed(args.seed)
+    np.random.seed(args.seed)
+    torch.manual_seed(args.seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed_all(args.seed)
+    print(f"🎲 Random seed set: {args.seed}")
     
     # Load dataset
     max_samples = 100 if args.test_mode else None

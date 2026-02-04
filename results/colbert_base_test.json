@@ -1,0 +1,11 @@
+{
+  "model": "colbert-v2-pretrained",
+  "split": "TEST",
+  "queries": 622,
+  "evaluated": 622,
+  "metrics": {
+    "MRR@10": 0.05657377634869595,
+    "Recall@1000": 0.28938906752411575,
+    "NDCG@10": 0.06067101887037579
+  }
+}
