@@ -1,0 +1,32 @@
+{
+  "dataset": "scifact",
+  "model": "constbert",
+  "metrics": {
+    "mrr@10": 0.5190502645502645,
+    "recall@50": 0.7172777777777778,
+    "recall@200": 0.7690555555555556,
+    "recall@1000": 0.8273888888888888,
+    "ndcg@10": 0.5330380950662775,
+    "ndcg@100": 0.5624826692264965,
+    "map@1000": 0.6060273387728409,
+    "p@10": 0.06899999999999999
+  },
+  "num_docs": 5183,
+  "num_queries": 300,
+  "timing": {
+    "encoding_time_s": 9.064018964767456,
+    "index_time_s": 8.510413408279419,
+    "query_time_s": 0.08727741241455078,
+    "retrieval_time_s": 5.905293703079224,
+    "total_time_s": 23.56700348854065
+  },
+  "config": {
+    "batch_size": 1024,
+    "query_batch_size": 512,
+    "num_workers": 40,
+    "nlist": 1024,
+    "nprobe": 128,
+    "ngpus": 1,
+    "device": "cuda"
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "dataset": "climate-fever",
+  "backend": "PLAID",
+  "metrics": {
+    "ndcg@10": 0.1098004386580677,
+    "recall@100": 0.0,
+    "recall@1000": 0.32751357220412597,
+    "map@100": 0.13291121725256955
+  },
+  "all_metrics": {
+    "mrr@10": 0.15590326249935368,
+    "recall@50": 0.21107491856677524,
+    "recall@200": 0.27894679695982627,
+    "recall@1000": 0.32751357220412597,
+    "ndcg@10": 0.1098004386580677,
+    "ndcg@100": 0.14000896916257205,
+    "map@1000": 0.13291121725256955,
+    "p@10": 0.03322475570032573
+  },
+  "config": {
+    "index": "climate-fever_constbert_plaid",
+    "k": 1000,
+    "ncells": 16,
+    "ndocs": 8192,
+    "centroid_score_threshold": 0.3
+  },
+  "timing": {
+    "total_time_s": 69.13202285766602,
+    "avg_time_ms": 45.037148441476226
+  },
+  "num_queries": 1535,
+  "num_docs": 5416593
+}

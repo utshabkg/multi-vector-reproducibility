@@ -1,0 +1,33 @@
+{
+  "dataset": "scifact",
+  "backend": "PLAID",
+  "metrics": {
+    "ndcg@10": 0.5420143963438969,
+    "recall@100": 0.0,
+    "recall@1000": 0.9693333333333334,
+    "map@100": 0.5324227169882544
+  },
+  "all_metrics": {
+    "mrr@10": 0.5197275132275132,
+    "recall@50": 0.7878888888888889,
+    "recall@200": 0.8732222222222223,
+    "recall@1000": 0.9693333333333334,
+    "ndcg@10": 0.5420143963438969,
+    "ndcg@100": 0.5846656759715368,
+    "map@1000": 0.5324227169882544,
+    "p@10": 0.072
+  },
+  "config": {
+    "index": "scifact_constbert_plaid",
+    "k": 1000,
+    "ncells": 16,
+    "ndocs": 8192,
+    "centroid_score_threshold": 0.3
+  },
+  "timing": {
+    "total_time_s": 1.3464806079864502,
+    "avg_time_ms": 4.488268693288167
+  },
+  "num_queries": 300,
+  "num_docs": 5183
+}

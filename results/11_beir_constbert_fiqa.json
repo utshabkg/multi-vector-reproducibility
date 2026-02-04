@@ -1,0 +1,32 @@
+{
+  "dataset": "fiqa",
+  "model": "constbert",
+  "metrics": {
+    "mrr@10": 0.21403157456398195,
+    "recall@50": 0.21011284668692076,
+    "recall@200": 0.24374441145274478,
+    "recall@1000": 0.2694369245295172,
+    "ndcg@10": 0.14665695654151986,
+    "ndcg@100": 0.16567670689378827,
+    "map@1000": 0.23334274871506502,
+    "p@10": 0.03873456790123457
+  },
+  "num_docs": 57638,
+  "num_queries": 648,
+  "timing": {
+    "encoding_time_s": 50.2966194152832,
+    "index_time_s": 18.873169898986816,
+    "query_time_s": 0.07728862762451172,
+    "retrieval_time_s": 15.465850591659546,
+    "total_time_s": 84.71292853355408
+  },
+  "config": {
+    "batch_size": 1024,
+    "query_batch_size": 512,
+    "num_workers": 40,
+    "nlist": 1024,
+    "nprobe": 128,
+    "ngpus": 1,
+    "device": "cuda"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "dataset": "arguana",
+  "model": "constbert",
+  "metrics": {
+    "mrr@10": 0.24122553004131952,
+    "recall@50": 0.9046941678520626,
+    "recall@200": 0.9623044096728307,
+    "recall@1000": 0.9871977240398293,
+    "ndcg@10": 0.35438879910042764,
+    "ndcg@100": 0.4062478934250973,
+    "map@1000": 0.2565153442972,
+    "p@10": 0.07076813655761023
+  },
+  "num_docs": 8674,
+  "num_queries": 1406,
+  "timing": {
+    "encoding_time_s": 7.650412559509277,
+    "index_time_s": 8.415282487869263,
+    "query_time_s": 0.23315739631652832,
+    "retrieval_time_s": 15.575100183486938,
+    "total_time_s": 31.873952627182007
+  },
+  "config": {
+    "batch_size": 1024,
+    "query_batch_size": 512,
+    "num_workers": 40,
+    "nlist": 1024,
+    "nprobe": 128,
+    "ngpus": 1,
+    "device": "cuda"
+  }
+}

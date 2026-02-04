@@ -1,0 +1,32 @@
+{
+  "dataset": "nq",
+  "model": "constbert",
+  "metrics": {
+    "mrr@10": 0.589379402784675,
+    "recall@50": 0.9386828891463885,
+    "recall@200": 0.9766801853997682,
+    "recall@1000": 0.9877124372344535,
+    "ndcg@10": 0.6332565830354832,
+    "ndcg@100": 0.6667710078923327,
+    "map@1000": 0.5756756319406243,
+    "p@10": 0.09817497103128622
+  },
+  "num_docs": 2681468,
+  "num_queries": 3452,
+  "timing": {
+    "encoding_time_s": 2345.7516136169434,
+    "index_time_s": 564.2037255764008,
+    "query_time_s": 0.6370935440063477,
+    "retrieval_time_s": 2972.562678337097,
+    "total_time_s": 5883.155111074448
+  },
+  "config": {
+    "batch_size": 1024,
+    "query_batch_size": 512,
+    "num_workers": 40,
+    "nlist": 1024,
+    "nprobe": 128,
+    "ngpus": 1,
+    "device": "cuda"
+  }
+}

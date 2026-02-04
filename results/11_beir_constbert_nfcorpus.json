@@ -1,0 +1,32 @@
+{
+  "dataset": "nfcorpus",
+  "model": "constbert",
+  "metrics": {
+    "mrr@10": 0.5121369600471768,
+    "recall@50": 0.22662546845226,
+    "recall@200": 0.3127941912674128,
+    "recall@1000": 0.5379988262018852,
+    "ndcg@10": 0.32102295499967076,
+    "ndcg@100": 0.2828853866090503,
+    "map@1000": 0.16576371819768781,
+    "p@10": 0.23250773993808047
+  },
+  "num_docs": 3633,
+  "num_queries": 323,
+  "timing": {
+    "encoding_time_s": 3.649440288543701,
+    "index_time_s": 7.313924789428711,
+    "query_time_s": 0.034610748291015625,
+    "retrieval_time_s": 3.429363250732422,
+    "total_time_s": 14.42733907699585
+  },
+  "config": {
+    "batch_size": 1024,
+    "query_batch_size": 512,
+    "num_workers": 40,
+    "nlist": 1024,
+    "nprobe": 128,
+    "ngpus": 1,
+    "device": "cuda"
+  }
+}

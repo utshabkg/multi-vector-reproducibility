@@ -1,0 +1,32 @@
+{
+  "dataset": "webis-touche2020",
+  "model": "constbert",
+  "metrics": {
+    "mrr@10": 0.452996436669906,
+    "recall@50": 0.18992250108663267,
+    "recall@200": 0.2663536517850884,
+    "recall@1000": 0.3630110786314274,
+    "ndcg@10": 0.19319186444072728,
+    "ndcg@100": 0.21629349108717014,
+    "map@1000": 0.08755107384783242,
+    "p@10": 0.17755102040816328
+  },
+  "num_docs": 382545,
+  "num_queries": 49,
+  "timing": {
+    "encoding_time_s": 362.8821380138397,
+    "index_time_s": 90.73128890991211,
+    "query_time_s": 0.022320032119750977,
+    "retrieval_time_s": 6.251368761062622,
+    "total_time_s": 459.8871157169342
+  },
+  "config": {
+    "batch_size": 1024,
+    "query_batch_size": 512,
+    "num_workers": 40,
+    "nlist": 1024,
+    "nprobe": 128,
+    "ngpus": 1,
+    "device": "cuda"
+  }
+}

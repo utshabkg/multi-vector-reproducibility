@@ -1,0 +1,33 @@
+{
+  "dataset": "dbpedia-entity",
+  "backend": "PLAID",
+  "metrics": {
+    "ndcg@10": 0.3093513674701878,
+    "recall@100": 0.0,
+    "recall@1000": 0.5920388690660063,
+    "map@100": 0.21265660942845244
+  },
+  "all_metrics": {
+    "mrr@10": 0.6257767857142857,
+    "recall@50": 0.3253239624116718,
+    "recall@200": 0.45577254170913173,
+    "recall@1000": 0.5920388690660063,
+    "ndcg@10": 0.3093513674701878,
+    "ndcg@100": 0.34914484691127873,
+    "map@1000": 0.21265660942845244,
+    "p@10": 0.25575000000000003
+  },
+  "config": {
+    "index": "dbpedia-entity_constbert_plaid",
+    "k": 1000,
+    "ncells": 16,
+    "ndocs": 8192,
+    "centroid_score_threshold": 0.3
+  },
+  "timing": {
+    "total_time_s": 9.508172512054443,
+    "avg_time_ms": 23.77043128013611
+  },
+  "num_queries": 400,
+  "num_docs": 4635922
+}

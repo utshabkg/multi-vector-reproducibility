@@ -1,0 +1,32 @@
+{
+  "dataset": "quora",
+  "model": "constbert",
+  "metrics": {
+    "mrr@10": 0.4058363492063492,
+    "recall@50": 0.4413547838166556,
+    "recall@200": 0.44701426815668055,
+    "recall@1000": 0.44829964668852124,
+    "ndcg@10": 0.3884392292718095,
+    "ndcg@100": 0.396296577684289,
+    "map@1000": 0.7497969110177745,
+    "p@10": 0.06971000000000001
+  },
+  "num_docs": 522931,
+  "num_queries": 10000,
+  "timing": {
+    "encoding_time_s": 441.58521699905396,
+    "index_time_s": 122.77830910682678,
+    "query_time_s": 1.1209745407104492,
+    "retrieval_time_s": 1616.8133153915405,
+    "total_time_s": 2182.2978160381317
+  },
+  "config": {
+    "batch_size": 1024,
+    "query_batch_size": 512,
+    "num_workers": 40,
+    "nlist": 1024,
+    "nprobe": 128,
+    "ngpus": 1,
+    "device": "cuda"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "dataset": "hotpotqa",
+  "model": "constbert",
+  "metrics": {
+    "mrr@10": 0.4056004094187754,
+    "recall@50": 0.34024307900067524,
+    "recall@200": 0.3731262660364619,
+    "recall@1000": 0.4040513166779203,
+    "ndcg@10": 0.2965732184841569,
+    "ndcg@100": 0.3111502149416267,
+    "map@1000": 0.3852943111386819,
+    "p@10": 0.05978392977717758
+  },
+  "num_docs": 5233329,
+  "num_queries": 7405,
+  "timing": {
+    "encoding_time_s": 4524.860048294067,
+    "index_time_s": 1086.5643231868744,
+    "query_time_s": 0.7964866161346436,
+    "retrieval_time_s": 16485.53328371048,
+    "total_time_s": 22097.754141807556
+  },
+  "config": {
+    "batch_size": 1024,
+    "query_batch_size": 512,
+    "num_workers": 40,
+    "nlist": 1024,
+    "nprobe": 128,
+    "ngpus": 1,
+    "device": "cuda"
+  }
+}

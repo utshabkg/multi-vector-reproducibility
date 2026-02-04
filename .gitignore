@@ -34,3 +34,8 @@ Thumbs.db
 ConstBERT/
 ConstBERT.pdf
 test_plaid_data/*
+*/colbert-replicability/*
+*Papers*
+checkpoints/*
+data/*
+paper/*

@@ -1,0 +1,33 @@
+{
+  "dataset": "trec-covid",
+  "backend": "PLAID",
+  "metrics": {
+    "ndcg@10": 0.4821063841013145,
+    "recall@100": 0.0,
+    "recall@1000": 0.3311312010412351,
+    "map@100": 0.11847685854176251
+  },
+  "all_metrics": {
+    "mrr@10": 0.7641666666666665,
+    "recall@50": 0.04712278276015497,
+    "recall@200": 0.1341863751745911,
+    "recall@1000": 0.3311312010412351,
+    "ndcg@10": 0.4821063841013145,
+    "ndcg@100": 0.3448282291497615,
+    "map@1000": 0.11847685854176251,
+    "p@10": 0.562
+  },
+  "config": {
+    "index": "trec-covid_constbert_plaid",
+    "k": 1000,
+    "ncells": 16,
+    "ndocs": 8192,
+    "centroid_score_threshold": 0.3
+  },
+  "timing": {
+    "total_time_s": 0.42354393005371094,
+    "avg_time_ms": 8.470878601074219
+  },
+  "num_queries": 50,
+  "num_docs": 171332
+}

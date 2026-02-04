@@ -1,0 +1,32 @@
+{
+  "dataset": "scidocs",
+  "model": "constbert",
+  "metrics": {
+    "mrr@10": 0.14864642857142857,
+    "recall@50": 0.13275000000000003,
+    "recall@200": 0.1888166666666667,
+    "recall@1000": 0.26905,
+    "ndcg@10": 0.07892445871991496,
+    "ndcg@100": 0.106986208167625,
+    "map@1000": 0.09718625891546974,
+    "p@10": 0.0385
+  },
+  "num_docs": 25657,
+  "num_queries": 1000,
+  "timing": {
+    "encoding_time_s": 0.07114076614379883,
+    "index_time_s": 3.0014569759368896,
+    "query_time_s": 0,
+    "retrieval_time_s": 19.26547360420227,
+    "total_time_s": 22.33807134628296
+  },
+  "config": {
+    "batch_size": 512,
+    "query_batch_size": 512,
+    "num_workers": 32,
+    "nlist": 256,
+    "nprobe": 64,
+    "ngpus": 2,
+    "device": "cuda"
+  }
+}

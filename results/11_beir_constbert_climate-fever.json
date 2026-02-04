@@ -1,0 +1,32 @@
+{
+  "dataset": "climate-fever",
+  "model": "constbert",
+  "metrics": {
+    "mrr@10": 0.04254666253037588,
+    "recall@50": 0.040325732899022804,
+    "recall@200": 0.05639522258414766,
+    "recall@1000": 0.0663843648208469,
+    "ndcg@10": 0.023839182094959787,
+    "ndcg@100": 0.030923156694383436,
+    "map@1000": 0.09554120770880611,
+    "p@10": 0.00729641693811075
+  },
+  "num_docs": 5416593,
+  "num_queries": 1535,
+  "timing": {
+    "encoding_time_s": 4739.988666534424,
+    "index_time_s": 1121.8403806686401,
+    "query_time_s": 0.17978906631469727,
+    "retrieval_time_s": 3013.4212329387665,
+    "total_time_s": 8875.430069208145
+  },
+  "config": {
+    "batch_size": 1024,
+    "query_batch_size": 512,
+    "num_workers": 40,
+    "nlist": 1024,
+    "nprobe": 128,
+    "ngpus": 1,
+    "device": "cuda"
+  }
+}

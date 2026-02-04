@@ -1,0 +1,32 @@
+{
+  "dataset": "dbpedia-entity",
+  "model": "constbert",
+  "metrics": {
+    "mrr@10": 0.7082281746031746,
+    "recall@50": 0.3148205611919525,
+    "recall@200": 0.3886981502063273,
+    "recall@1000": 0.44431159863293673,
+    "ndcg@10": 0.36189028681682095,
+    "ndcg@100": 0.36355177814889994,
+    "map@1000": 0.230050400352434,
+    "p@10": 0.3245
+  },
+  "num_docs": 4635922,
+  "num_queries": 400,
+  "timing": {
+    "encoding_time_s": 10782.461101055145,
+    "index_time_s": 1040.4177706241608,
+    "query_time_s": 0.052668094635009766,
+    "retrieval_time_s": 657.2204339504242,
+    "total_time_s": 12480.151973724365
+  },
+  "config": {
+    "batch_size": 1024,
+    "query_batch_size": 512,
+    "num_workers": 40,
+    "nlist": 1024,
+    "nprobe": 128,
+    "ngpus": 1,
+    "device": "cuda"
+  }
+}
