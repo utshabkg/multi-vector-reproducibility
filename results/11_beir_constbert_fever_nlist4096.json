@@ -1,0 +1,32 @@
+{
+  "dataset": "fever",
+  "model": "constbert",
+  "metrics": {
+    "mrr@10": 0.11865644897823115,
+    "recall@50": 0.14105267669624105,
+    "recall@200": 0.1441894189418942,
+    "recall@1000": 0.1463118335643088,
+    "ndcg@10": 0.11686469500632901,
+    "ndcg@100": 0.11934195471192822,
+    "map@1000": 0.6640348194642886,
+    "p@10": 0.014911491149114912
+  },
+  "num_docs": 5416568,
+  "num_queries": 6666,
+  "timing": {
+    "encoding_time_s": 4707.492709636688,
+    "index_time_s": 4405.488238334656,
+    "query_time_s": 0.7256278991699219,
+    "retrieval_time_s": 3351.231013059616,
+    "total_time_s": 12464.93758893013
+  },
+  "config": {
+    "batch_size": 512,
+    "query_batch_size": 512,
+    "num_workers": 32,
+    "nlist": 4096,
+    "nprobe": 128,
+    "ngpus": 2,
+    "device": "cuda"
+  }
+}
