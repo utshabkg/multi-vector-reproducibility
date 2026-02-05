@@ -1,0 +1,102 @@
+{
+  "experiment": "PLAID Parameter Sweep",
+  "sample_size": 500,
+  "paper_reported": 0.3904,
+  "sweep_results": [
+    {
+      "ncells": 4,
+      "threshold": 0.3,
+      "mrr@10": 0.2936507936507937,
+      "time_seconds": 6.002907037734985
+    },
+    {
+      "ncells": 4,
+      "threshold": 0.4,
+      "mrr@10": 0.2870373015873017,
+      "time_seconds": 5.410511016845703
+    },
+    {
+      "ncells": 4,
+      "threshold": 0.5,
+      "mrr@10": 0.2717960317460317,
+      "time_seconds": 5.212223291397095
+    },
+    {
+      "ncells": 8,
+      "threshold": 0.3,
+      "mrr@10": 0.2936507936507937,
+      "time_seconds": 8.156856060028076
+    },
+    {
+      "ncells": 8,
+      "threshold": 0.4,
+      "mrr@10": 0.2870373015873017,
+      "time_seconds": 7.975616693496704
+    },
+    {
+      "ncells": 8,
+      "threshold": 0.5,
+      "mrr@10": 0.2711293650793651,
+      "time_seconds": 7.540285348892212
+    },
+    {
+      "ncells": 16,
+      "threshold": 0.3,
+      "mrr@10": 0.2936507936507937,
+      "time_seconds": 13.043165683746338
+    },
+    {
+      "ncells": 16,
+      "threshold": 0.4,
+      "mrr@10": 0.2870373015873017,
+      "time_seconds": 12.494853973388672
+    },
+    {
+      "ncells": 16,
+      "threshold": 0.5,
+      "mrr@10": 0.2711293650793651,
+      "time_seconds": 12.080277681350708
+    },
+    {
+      "ncells": 32,
+      "threshold": 0.3,
+      "mrr@10": 0.2936507936507937,
+      "time_seconds": 21.344831466674805
+    },
+    {
+      "ncells": 32,
+      "threshold": 0.4,
+      "mrr@10": 0.2870373015873017,
+      "time_seconds": 20.675896406173706
+    },
+    {
+      "ncells": 32,
+      "threshold": 0.5,
+      "mrr@10": 0.2711293650793651,
+      "time_seconds": 19.957863330841064
+    },
+    {
+      "ncells": 64,
+      "threshold": 0.3,
+      "mrr@10": 0.2936507936507937,
+      "time_seconds": 35.33627891540527
+    },
+    {
+      "ncells": 64,
+      "threshold": 0.4,
+      "mrr@10": 0.2870373015873017,
+      "time_seconds": 34.37657356262207
+    },
+    {
+      "ncells": 64,
+      "threshold": 0.5,
+      "mrr@10": 0.2711293650793651,
+      "time_seconds": 33.33912754058838
+    }
+  ],
+  "best_config": {
+    "ncells": 4,
+    "threshold": 0.3
+  },
+  "best_mrr10": 0.2936507936507937
+}
