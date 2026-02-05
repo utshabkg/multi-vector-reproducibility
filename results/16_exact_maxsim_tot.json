@@ -1,0 +1,19 @@
+{
+  "experiment": "Exact MaxSim Upper Bound",
+  "seed": 42,
+  "num_queries": 100,
+  "num_documents": 6407814,
+  "metrics": {
+    "mrr@10": 0.05083333333333333,
+    "recall@1000": 0.24,
+    "ndcg@10": 0.055616063116448504,
+    "mean_time_seconds": 64.9888984298706
+  },
+  "comparison": {
+    "faiss_mrr@10": 0.0427,
+    "faiss_recall@1000": 0.2588,
+    "plaid_mrr@10": 0.0566,
+    "plaid_recall@1000": 0.2894
+  },
+  "interpretation": "This establishes the architectural upper bound for MaxSim on ToT. If Exact >> FAISS/PLAID, the problem is approximation quality. If Exact \u2248 FAISS/PLAID, the problem is MaxSim's uniform token weighting."
+}
