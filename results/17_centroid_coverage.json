@@ -1,0 +1,17 @@
+{
+  "model": "constbert",
+  "num_documents": 5000,
+  "vectors_per_doc": 32,
+  "num_centroids_total": 32768,
+  "statistics": {
+    "mean_unique_centroids": 12.1304,
+    "median_unique_centroids": 12.0,
+    "std_unique_centroids": 3.2090178933748565,
+    "min_unique_centroids": 3,
+    "max_unique_centroids": 25,
+    "p25_unique_centroids": 10.0,
+    "p75_unique_centroids": 14.0
+  },
+  "coverage_ratio": 0.379075,
+  "interpretation": "ConstBERT's 32 vectors per document map to an average of 12.1 unique centroids (37.9% coverage). This sparse coverage explains why standard PLAID parameters (ncells=4) fail: with only 12 centroids per doc, the probability of hitting relevant documents when probing few centroids is low."
+}
