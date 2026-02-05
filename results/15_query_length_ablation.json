@@ -1,0 +1,66 @@
+{
+  "experiment": "Query Length Ablation",
+  "seed": 42,
+  "dataset": {
+    "num_queries": 622,
+    "num_with_relevance": 622,
+    "original_query_stats": {
+      "mean_length": 171.81511254019293,
+      "median_length": 182.0,
+      "min_length": 28,
+      "max_length": 959,
+      "std_length": 124.31432349343508
+    }
+  },
+  "lengths": {
+    "10": {
+      "mrr@10": 0.020895217679783595,
+      "recall@1000": 0.1639871382636656,
+      "ndcg@10": 0.02508560199536912,
+      "actual_mean_length": 10.0,
+      "pct_queries_truncated": 100.0
+    },
+    "20": {
+      "mrr@10": 0.04321186137906396,
+      "recall@1000": 0.25241157556270094,
+      "ndcg@10": 0.05053635410194952,
+      "actual_mean_length": 20.0,
+      "pct_queries_truncated": 100.0
+    },
+    "40": {
+      "mrr@10": 0.04268042157913541,
+      "recall@1000": 0.25884244372990356,
+      "ndcg@10": 0.048217164333040616,
+      "actual_mean_length": 39.89067524115756,
+      "pct_queries_truncated": 98.71382636655949
+    },
+    "60": {
+      "mrr@10": 0.04268042157913541,
+      "recall@1000": 0.25884244372990356,
+      "ndcg@10": 0.048217164333040616,
+      "actual_mean_length": 58.961414790996784,
+      "pct_queries_truncated": 84.72668810289389
+    },
+    "80": {
+      "mrr@10": 0.04268042157913541,
+      "recall@1000": 0.25884244372990356,
+      "ndcg@10": 0.048217164333040616,
+      "actual_mean_length": 74.05144694533762,
+      "pct_queries_truncated": 72.02572347266882
+    },
+    "100": {
+      "mrr@10": 0.04268042157913541,
+      "recall@1000": 0.25884244372990356,
+      "ndcg@10": 0.048217164333040616,
+      "actual_mean_length": 87.81189710610933,
+      "pct_queries_truncated": 65.7556270096463
+    },
+    "121": {
+      "mrr@10": 0.04268042157913541,
+      "recall@1000": 0.25884244372990356,
+      "ndcg@10": 0.048217164333040616,
+      "actual_mean_length": 101.19774919614147,
+      "pct_queries_truncated": 62.057877813504824
+    }
+  }
+}
