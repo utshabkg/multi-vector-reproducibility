@@ -1,22 +1,23 @@
-# Python cache
+# Python
 __pycache__/
 *.py[cod]
 *$py.class
 *.so
-.Python
+*.egg-info/
+dist/
+build/
+*.egg
 
-# Results (local only - shared data stored elsewhere)
-reproduce/results/
-
-# Jupyter
-.ipynb_checkpoints/
-*.ipynb
-
-# Environment
-.env
-.venv
-env/
-venv/
+# Data files (use download scripts to obtain)
+data/
+indices/
+checkpoints/
+*.npy
+*.npy.gz
+*.pkl
+*.bin
+*.pt
+*.safetensors
 
 # IDE
 .vscode/
@@ -29,14 +30,10 @@ venv/
 .DS_Store
 Thumbs.db
 
+# Logs
+logs/
 *.log
 
-ConstBERT/
-ConstBERT.pdf
-test_plaid_data/*
-*/colbert-replicability/*
-*Papers*
-checkpoints/*
-data/*
-paper/*
-draft/*
+# Temporary files
+tmp/
+*.tmp
