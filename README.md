@@ -1,4 +1,5 @@
 # Reproducibility Study of Multi-Vector Retrieval Models
+### Accepted at SIGIR 2026. Paper: [here](https://dl.acm.org/doi/abs/10.1145/3805712.3808561)
 
 Code and results for our SIGIR 2026 Reproducibility Track submission examining ConstBERT and ColBERT-v2 multi-vector dense retrieval models.
 
