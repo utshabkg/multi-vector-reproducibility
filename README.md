@@ -1,6 +1,7 @@
-# ConstBERT Reproducibility Study
+# Multi-Vector Reproducibility Study
+### Accepted at SIGIR 2026. Paper: [here](https://dl.acm.org/doi/abs/10.1145/3805712.3808561)
 
-Systematic reproducibility study of **"Efficient Constant-Space Multi-Vector Retrieval"** (ECIR 2025) for SIGIR A* reproducibility track.
+Systematic reproducibility study of **"Efficient Constant-Space Multi-Vector Retrieval"** (ECIR 2025) for the SIGIR reproducibility track.
 
 ## Quick Results
 
@@ -222,4 +223,4 @@ nbits = 1             # Residual quantization bits
 
 ## License
 
-This reproducibility study is for academic purposes. See original paper for model license.
+This reproducibility study is for academic purposes. See the original paper for the model license.
