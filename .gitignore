@@ -9,7 +9,7 @@ build/
 *.egg
 
 # Data files (use download scripts to obtain)
-data/
+/data/
 indices/
 checkpoints/
 *.npy
@@ -37,3 +37,6 @@ logs/
 # Temporary files
 tmp/
 *.tmp
+
+# Paper draft (LaTeX sources, not part of the code release)
+draft/
