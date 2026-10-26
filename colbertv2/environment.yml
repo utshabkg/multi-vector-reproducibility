@@ -1,0 +1,33 @@
+name: colbertv2
+channels:
+  - pytorch
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.8
+  - pip
+  - pytorch
+  - torchvision
+  - torchaudio
+  - faiss-gpu
+  - transformers
+  - sentencepiece
+  - ujson
+  - tqdm
+  - huggingface_hub
+  - pillow
+  - libtiff
+  - ninja
+  - cmake
+  - libxcrypt
+  - gcc_linux-64
+  - gxx_linux-64
+  - pip:
+    - -r requirements.txt
+
+# Notes:
+# - Install a matching CUDA toolkit for your GPU when creating the env (if required).
+#   Example: set `cudatoolkit=11.7` or install a CUDA-enabled `pytorch` from the
+#   `pytorch` channel that matches your system.
+# - This file is minimal: adjust package versions (torch, faiss-gpu) to match
+#   your CUDA driver / hardware compatibility.
