@@ -12,10 +12,10 @@ This will demonstrate whether PLAID incompatibility extends to out-of-domain tas
 
 Usage:
     # Evaluate single dataset
-    python experiments/12-3_beir_plaid_eval.py --dataset scifact
+    python experiments/rq3/12-3_beir_plaid_eval.py --dataset scifact
 
     # Evaluate all 5 priority datasets
-    python experiments/12-3_beir_plaid_eval.py --all
+    python experiments/rq3/12-3_beir_plaid_eval.py --all
 """
 
 import os

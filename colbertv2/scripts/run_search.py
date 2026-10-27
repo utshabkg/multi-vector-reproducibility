@@ -7,13 +7,11 @@ Usage:
 If `--index` is a full index path, the script will derive `index_root` and `index` name.
 """
 import os
-import sys
 from argparse import ArgumentParser
 
-# Ensure ColBERT-v2 is importable (repo root is three levels up)
-REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..'))
-COLBERT_ROOT = os.path.join(REPO_ROOT, 'ColBERT-v2')
-sys.path.insert(0, COLBERT_ROOT)
+# Repo root is two levels up (colbertv2/scripts)
+REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
+# ColBERT should be installed via: pip install colbert-ai
 
 from colbert.data import Queries
 from colbert import Searcher

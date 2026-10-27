@@ -4,7 +4,7 @@ Multi-seed fine-tuning for statistical significance.
 Runs 3 seeds for both ColBERT and ConstBERT in parallel on separate GPUs.
 
 Usage:
-    python experiments/run_multiseed_finetuning.py --parallel
+    python experiments/rq5/run_multiseed_finetuning.py --parallel
 """
 
 import subprocess
@@ -21,7 +21,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 # ConstBERT config
 CONSTBERT_CONFIG = {
-    "script": "experiments/10_finetune_constbert_tot.py",
+    "script": "experiments/rq5/10_finetune_constbert_tot.py",
     "base_args": [
         "--triples_file", "indices/processed/trec-tot-2025-triple-bm25/train.triples",
         "--corpus_file", "data/trec-tot-2025/raw/trec-tot-2025-corpus.jsonl",
@@ -36,7 +36,7 @@ CONSTBERT_CONFIG = {
 
 # ColBERT config
 COLBERT_CONFIG = {
-    "script": "colbert-replicability/colbert/scripts/train_colbert_tot_triples.py",
+    "script": "../colbertv2/scripts/train_colbert_tot_triples.py",
     "base_args": [
         "--triples_file", "indices/processed/trec-tot-2025-triple-bm25/train.triples",
         "--corpus_file", "data/trec-tot-2025/raw/trec-tot-2025-corpus.jsonl",
@@ -91,12 +91,12 @@ def run_constbert_seed(seed: int, gpu_id: int):
 
 def run_colbert_seed(seed: int, gpu_id: int):
     """Run ColBERT fine-tuning with a specific seed."""
-    output_dir = BASE_DIR / f"colbert-replicability/colbert/models/colbertv2-tot-seed{seed}"
+    output_dir = BASE_DIR / f"../colbertv2/models/colbertv2-tot-seed{seed}"
     output_dir.mkdir(parents=True, exist_ok=True)
     
     env = os.environ.copy()
     env["CUDA_VISIBLE_DEVICES"] = str(gpu_id)
-    env["PYTHONPATH"] = str(BASE_DIR) + ":" + str(BASE_DIR / "colbert-replicability/colbert")
+    env["PYTHONPATH"] = str(BASE_DIR) + ":" + str(BASE_DIR / "../colbertv2")
     # Set seed via environment variable
     env["RANDOM_SEED"] = str(seed)
     

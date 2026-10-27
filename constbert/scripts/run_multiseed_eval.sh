@@ -14,13 +14,13 @@ echo ""
 # Evaluate ConstBERT seeds (can run on GPU 0)
 for seed in 42 123 456; do
     echo "[$(date)] Evaluating ConstBERT seed=$seed..."
-    CUDA_VISIBLE_DEVICES=0 python experiments/eval_multiseed_tot.py --model constbert --seed $seed
+    CUDA_VISIBLE_DEVICES=0 python experiments/rq5/eval_multiseed_tot.py --model constbert --seed $seed
 done
 
 # Aggregate results
 echo ""
 echo "[$(date)] Aggregating results..."
-python experiments/eval_multiseed_tot.py --aggregate
+python experiments/rq5/eval_multiseed_tot.py --aggregate
 
 echo ""
 echo "========================================"

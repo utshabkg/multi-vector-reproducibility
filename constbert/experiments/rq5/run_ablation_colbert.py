@@ -6,9 +6,9 @@ This script must run in the colbertv2 conda environment!
 
 Usage:
     conda activate colbertv2
-    python experiments/run_ablation_colbert.py --test-mode
-    python experiments/run_ablation_colbert.py --seed 42
-    python experiments/run_ablation_colbert.py --full
+    python experiments/rq5/run_ablation_colbert.py --test-mode
+    python experiments/rq5/run_ablation_colbert.py --seed 42
+    python experiments/rq5/run_ablation_colbert.py --full
 """
 
 import os
@@ -28,8 +28,8 @@ import torch.nn.functional as F
 from torch.utils.data import Dataset, DataLoader
 from tqdm import tqdm
 
-# Add paths for ColBERT imports - need to be in the colbert directory
-COLBERT_SRC_DIR = Path(__file__).resolve().parent.parent.parent.parent / "colbertv2"
+# Add paths for ColBERT imports: src/colbert_model.py lives in colbertv1/
+COLBERT_SRC_DIR = Path(__file__).resolve().parent.parent.parent.parent / "colbertv1"
 sys.path.insert(0, str(COLBERT_SRC_DIR))
 sys.path.insert(0, str(COLBERT_SRC_DIR.parent))
 

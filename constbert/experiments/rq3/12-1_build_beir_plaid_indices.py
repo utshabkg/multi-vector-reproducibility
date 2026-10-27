@@ -10,8 +10,8 @@ This script:
 5. Saves PLAID indices for retrieval
 
 Usage:
-    python experiments/12-1_build_beir_plaid_indices.py constbert --all
-    python experiments/12-1_build_beir_plaid_indices.py constbert --dataset scidocs
+    python experiments/rq3/12-1_build_beir_plaid_indices.py constbert --all
+    python experiments/rq3/12-1_build_beir_plaid_indices.py constbert --dataset scidocs
 """
 
 import argparse

@@ -4,6 +4,9 @@
 
 set -e  # Exit on error
 
+BASE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$BASE_DIR"
+
 echo "================================================================================"
 echo "BEIR PLAID Evaluation - Exact Reproduction Attempt"
 echo "================================================================================"
@@ -13,7 +16,7 @@ echo "the architectural incompatibility discovered in RQ2 extends to out-of-doma
 echo ""
 
 # Configuration
-SCRIPT="experiments/12-3_beir_plaid_eval.py"
+SCRIPT="experiments/rq3/12-3_beir_plaid_eval.py"
 INDEX_ROOT="indices/beir_plaid"
 DATA_DIR="./data/beir"
 OUTPUT_DIR="results"

@@ -11,7 +11,7 @@ INDEX_NAME="${3:-trec-tot-2025-colbertv2}"
 INDICES_ROOT="${4:-indices}"
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-REPO_ROOT="$(cd "$SCRIPT_DIR/../../.." && pwd)"
+REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 PY_CANDIDATE="$(conda run -n colbertv2 which python 2>/dev/null || echo python)"
 if [ -x "$PY_CANDIDATE" ]; then
   PY="$PY_CANDIDATE"
@@ -19,7 +19,7 @@ else
   PY="$(command -v python3 || command -v python)"
 fi
 
-LOG_DIR="$REPO_ROOT/replicability/colbert/logs"
+LOG_DIR="$REPO_ROOT/colbertv2/logs"
 mkdir -p "$LOG_DIR"
 TIMESTAMP=$(date +%F_%H%M%S)
 LOG="$LOG_DIR/index_${INDEX_NAME}_$TIMESTAMP.log"
@@ -45,16 +45,16 @@ echo "Logging to $LOG"
 # If collection is JSONL, convert to TSV first (ColBERT-v2 expects TSV loader)
 COLLECTION_ARG="$COLLECTION_PATH"
 if [[ "$COLLECTION_PATH" == *.jsonl ]]; then
-  TMP_DIR="$REPO_ROOT/replicability/colbert/tmp"
+  TMP_DIR="$REPO_ROOT/colbertv2/tmp"
   mkdir -p "$TMP_DIR"
   CONVERTED="$TMP_DIR/${INDEX_NAME}_collection.tsv"
   MAP_OUT="$TMP_DIR/${INDEX_NAME}_idmap.tsv"
   echo "Converting JSONL collection $COLLECTION_PATH -> $CONVERTED (mapping -> $MAP_OUT)"
-  "$PY" "$REPO_ROOT/replicability/colbert/scripts/convert_jsonl_to_tsv.py" "$COLLECTION_PATH" "$CONVERTED" "$MAP_OUT"
+  "$PY" "$REPO_ROOT/colbertv2/scripts/convert_jsonl_to_tsv.py" "$COLLECTION_PATH" "$CONVERTED" "$MAP_OUT"
   COLLECTION_ARG="$CONVERTED"
 fi
 
-"$PY" "$REPO_ROOT/replicability/colbert/scripts/index_colbertv2.py" \
+"$PY" "$REPO_ROOT/colbertv2/scripts/index_colbertv2.py" \
   --collection "$COLLECTION_ARG" \
   --index-name "$INDEX_NAME" \
   --checkpoint "$CHECKPOINT" \

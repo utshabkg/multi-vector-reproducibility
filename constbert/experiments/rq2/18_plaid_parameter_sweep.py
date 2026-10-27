@@ -21,7 +21,7 @@ from tqdm import tqdm
 
 # Add paths
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent / "external" / "ColBERT"))
+# ColBERT should be installed via: pip install colbert-ai
 
 from colbert.infra import ColBERTConfig
 from colbert.search.index_storage import IndexScorer

@@ -10,10 +10,10 @@ This script addresses reviewer concerns by:
 
 Usage:
     # Quick test (5 minutes) - verify pipeline works
-    python experiments/run_ablation_finetuning.py --test-mode
+    python experiments/rq5/run_ablation_constbert.py --test-mode
     
     # Full run (3-4 hours)
-    python experiments/run_ablation_finetuning.py --full
+    python experiments/rq5/run_ablation_constbert.py --full
 """
 
 import os

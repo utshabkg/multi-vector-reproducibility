@@ -11,8 +11,8 @@ from pathlib import Path
 from torch.utils.data import DataLoader
 
 # Add parent directories to path to access src modules
-sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent))  # Go up to colbert-reproduce root
-sys.path.insert(0, str(Path(__file__).parent.parent.parent))  # Go up to replicability
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent / "colbertv1"))  # src/colbert_training.py and src/colbert_model.py live in colbertv1/
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))  # Go up to repo root
 
 # Now import after path is set
 from tot_data_loaders_triples import TOTTriplesDataset, TOTTriplesDatasetValidation
@@ -273,7 +273,7 @@ if __name__ == "__main__":
                         default='colbert-ir/colbertv2.0',
                         help='Path to initial checkpoint (ColBERT-v2 base)')
     parser.add_argument('--checkpoint_dir', type=str,
-                        default='replicability/colbert/models/colbertv2-fine-tot',
+                        default='colbertv2/models/colbertv2-fine-tot',
                         help='Directory to save checkpoints')
 
     # Training hyperparameters

@@ -6,8 +6,8 @@ The IVF maps centroids to document IDs, which is required for PLAID search.
 This script adds the missing ivf.pt and ivf.pid.pt files to existing indices.
 
 Usage:
-    python experiments/15_build_ivf_for_beir.py --dataset scifact
-    python experiments/15_build_ivf_for_beir.py --all
+    python experiments/rq3/12-2_build_ivf_for_beir.py --dataset scifact
+    python experiments/rq3/12-2_build_ivf_for_beir.py --all
 """
 
 import os

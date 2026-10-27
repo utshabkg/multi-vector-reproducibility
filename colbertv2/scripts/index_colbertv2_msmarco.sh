@@ -11,7 +11,7 @@ INDEX_NAME="${3:-msmarco-passage-colbertv2}"
 INDICES_ROOT="${4:-indices}"
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-REPO_ROOT="$(cd "$SCRIPT_DIR/../../.." && pwd)"
+REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 PY_CANDIDATE="$(conda run -n colbertv2 which python 2>/dev/null || echo python)"
 if [ -x "$PY_CANDIDATE" ]; then
   PY="$PY_CANDIDATE"
@@ -19,7 +19,7 @@ else
   PY="$(command -v python3 || command -v python)"
 fi
 
-LOG_DIR="$REPO_ROOT/replicability/colbert/logs"
+LOG_DIR="$REPO_ROOT/colbertv2/logs"
 mkdir -p "$LOG_DIR"
 TIMESTAMP=$(date +%F_%H%M%S)
 LOG="$LOG_DIR/index_${INDEX_NAME}_$TIMESTAMP.log"
@@ -44,7 +44,7 @@ echo "Detected nranks=$NRANKS"
 echo "Logging to $LOG"
 
 # Run the indexer in the foreground and tee output to the log file.
-"$PY" "$REPO_ROOT/replicability/colbert/scripts/index_colbertv2.py" \
+"$PY" "$REPO_ROOT/colbertv2/scripts/index_colbertv2.py" \
   --collection "$COLLECTION_PATH" \
   --index-name "$INDEX_NAME" \
   --checkpoint "$CHECKPOINT" \

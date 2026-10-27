@@ -19,13 +19,19 @@ from pathlib import Path
 # Add parent directory for imports
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
 
-from experiments.beir_evaluation import (
-    BEIRDataset, 
-    encode_beir_corpus, 
-    encode_beir_queries,
-    OptimizedFAISSIndex,
-    retrieve_and_evaluate
-)
+# The BEIR helpers live in 11_beir_evaluation.py. Its name starts with a
+# digit, so it cannot be imported by name. Load it from its file instead.
+import importlib.util
+_beir_spec = importlib.util.spec_from_file_location(
+    "beir_evaluation", Path(__file__).resolve().parent / "11_beir_evaluation.py")
+beir_evaluation = importlib.util.module_from_spec(_beir_spec)
+sys.modules["beir_evaluation"] = beir_evaluation
+_beir_spec.loader.exec_module(beir_evaluation)
+BEIRDataset = beir_evaluation.BEIRDataset
+encode_beir_corpus = beir_evaluation.encode_beir_corpus
+encode_beir_queries = beir_evaluation.encode_beir_queries
+OptimizedFAISSIndex = beir_evaluation.OptimizedFAISSIndex
+retrieve_and_evaluate = beir_evaluation.retrieve_and_evaluate
 from models.constbert_wrapper import ConstBERTWrapper
 
 logging.basicConfig(level=logging.INFO)

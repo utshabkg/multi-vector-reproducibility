@@ -8,8 +8,8 @@ helping determine whether reproduction challenges are ConstBERT-specific
 or affect all multi-vector models.
 
 Usage:
-    python experiments/13_beir_colbertv2_evaluation.py --dataset scifact
-    python experiments/13_beir_colbertv2_evaluation.py --all
+    python experiments/rq3/13_beir_colbertv2_evaluation.py --dataset scifact
+    python experiments/rq3/13_beir_colbertv2_evaluation.py --all
 """
 
 import argparse
@@ -29,9 +29,7 @@ from tqdm import tqdm
 sys.stdout.reconfigure(line_buffering=True)
 sys.stderr.reconfigure(line_buffering=True)
 
-# Add external ColBERT to path
-COLBERT_PATH = Path(__file__).resolve().parent.parent.parent / "external" / "ColBERT"
-sys.path.insert(0, str(COLBERT_PATH))
+# ColBERT should be installed via: pip install colbert-ai
 
 # ColBERT imports
 from colbert import Indexer, Searcher

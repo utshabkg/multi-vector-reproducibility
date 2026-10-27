@@ -5,11 +5,11 @@ Reproducing Table 1 TREC DL results from ConstBERT paper.
 Reuses existing embeddings and index from Experiment 1.
 """
 import sys
+from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
 
 import json
 import numpy as np
-from pathlib import Path
 from tqdm import tqdm
 import time
 

@@ -3,10 +3,13 @@
 # OPTIMIZED BEIR Evaluation Script
 # Configured for: 120 CPU cores, 700GB RAM, 2x RTX 6000 Ada GPUs
 #
-# Usage: bash run_beir_evaluation_optimized.sh
+# Usage: bash constbert/scripts/run_beir_evaluation.sh
 #
 
 set -e  # Exit on error
+
+BASE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$BASE_DIR"
 
 echo "=============================================="
 echo "OPTIMIZED BEIR Evaluation"
@@ -75,7 +78,7 @@ for DATASET in "${DATASETS[@]}"; do
     START=$(date +%s)
     
     # Run evaluation
-    python -u experiments/11_beir_evaluation.py \
+    python -u experiments/rq3/11_beir_evaluation.py \
         --model "$MODEL" \
         --dataset "$DATASET" \
         --data-dir "$DATA_DIR" \

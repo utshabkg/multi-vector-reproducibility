@@ -12,7 +12,7 @@ echo "Estimated time: ~6-9 hours"
 echo ""
 
 # Activate environment
-source ~/anaconda3/etc/profile.d/conda.sh
+source $(conda info --base)/etc/profile.d/conda.sh
 conda activate colbertv2 2>/dev/null || conda activate constbert
 
 # Fix CUDA architecture for RTX 6000 Ada (compute 8.9 → use 8.6 for CUDA 11.7)
@@ -22,17 +22,17 @@ export TORCH_CUDA_ARCH_LIST="8.6"
 for seed in 42 123 456; do
     echo ""
     echo "[$(date)] Starting ColBERT seed=$seed..."
-    python -u experiments/eval_multiseed_colbert.py --seed $seed
+    python -u experiments/rq5/eval_multiseed_colbert.py --seed $seed
     echo "[$(date)] Completed ColBERT seed=$seed"
 done
 
 # Aggregate results
 echo ""
 echo "[$(date)] Aggregating results..."
-python -u experiments/eval_multiseed_colbert.py --aggregate
+python -u experiments/rq5/eval_multiseed_colbert.py --aggregate
 
 # Also aggregate ConstBERT for comparison
-python -u experiments/eval_multiseed_tot.py --aggregate
+python -u experiments/rq5/eval_multiseed_tot.py --aggregate
 
 echo ""
 echo "========================================"

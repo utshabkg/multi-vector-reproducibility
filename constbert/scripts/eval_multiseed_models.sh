@@ -28,7 +28,7 @@ for seed in "${SEEDS[@]}"; do
         echo "Evaluating ConstBERT seed=$seed..."
         for split in "${EVAL_SPLITS[@]}"; do
             echo "  - Split: $split"
-            python experiments/10_eval_finetuned_tot_test.py \
+            python experiments/rq5/10_eval_finetuned_tot_test.py \
                 --checkpoint_dir "$CKPT_DIR" \
                 --split "$split" \
                 --output_file "$RESULTS_DIR/constbert_seed${seed}_${split}.json" \
@@ -43,7 +43,7 @@ done
 echo ""
 echo "=== Evaluating ColBERT models ==="
 for seed in "${SEEDS[@]}"; do
-    CKPT_DIR="$BASE_DIR/colbert-replicability/colbert/models/colbertv2-tot-seed${seed}"
+    CKPT_DIR="$BASE_DIR/../colbertv2/models/colbertv2-tot-seed${seed}"
     if [ -d "$CKPT_DIR" ]; then
         echo "Evaluating ColBERT seed=$seed..."
         # ColBERT evaluation via its own script

@@ -29,7 +29,7 @@ run_constbert() {
     
     echo "[$(date '+%H:%M:%S')] ConstBERT seed=$SEED starting on GPU $GPU..."
     
-    CUDA_VISIBLE_DEVICES=$GPU python experiments/10_finetune_constbert_tot.py \
+    CUDA_VISIBLE_DEVICES=$GPU python experiments/rq5/10_finetune_constbert_tot.py \
         --triples_file indices/trec-tot-2025/trec-tot-2025-triple-bm25/train.triples \
         --corpus_file data/trec-tot-2025/trec-tot-2025-corpus.jsonl \
         --queries_file data/trec-tot-2025/queries/train-2025-queries.jsonl \
@@ -49,7 +49,7 @@ run_constbert() {
 run_colbert() {
     local SEED=$1
     local GPU=$2
-    local COLBERT_DIR="$BASE_DIR/colbert-reproduce-copy/colbert-replicability/colbert"
+    local COLBERT_DIR="$BASE_DIR/../colbertv2"
     local OUTPUT_DIR="$COLBERT_DIR/models/colbertv2-tot-seed${SEED}"
     local LOG_FILE="$RESULTS_DIR/colbert_seed${SEED}.log"
     
@@ -124,5 +124,5 @@ echo ""
 echo "Checkpoints saved to:"
 for seed in "${SEEDS[@]}"; do
     echo "  - checkpoints/constbert_tot_seed${seed}/"
-    echo "  - colbert-replicability/colbert/models/colbertv2-tot-seed${seed}/"
+    echo "  - ../colbertv2/models/colbertv2-tot-seed${seed}/"
 done

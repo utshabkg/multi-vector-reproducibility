@@ -4,6 +4,9 @@
 
 set -e  # Exit on error
 
+BASE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$BASE_DIR"
+
 echo "╔════════════════════════════════════════════════════════════════════════════╗"
 echo "║                    ConstBERT ToT Fine-tuning Pipeline                      ║"
 echo "╚════════════════════════════════════════════════════════════════════════════╝"
@@ -114,7 +117,7 @@ if $TEST_MODE; then
     FINETUNE_ARGS+=(--test_mode --max_steps 50)
 fi
 
-run_step "Fine-tune ConstBERT on TRAIN split" python -u experiments/10_finetune_constbert_tot.py "${FINETUNE_ARGS[@]}"
+run_step "Fine-tune ConstBERT on TRAIN split" python -u experiments/rq5/10_finetune_constbert_tot.py "${FINETUNE_ARGS[@]}"
 
 # Step 3: Create evaluation script (reusable for both DEV and TEST)
 EVAL_SCRIPT="experiments/10_eval_finetuned_constbert.py"

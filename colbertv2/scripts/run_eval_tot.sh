@@ -6,7 +6,7 @@ set -euo pipefail
 # ./run_eval_tot.sh [index_path] [queries_path] [qrels_path] [out_ranking] [k] [checkpoint] [collection]
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-REPO_ROOT="$(cd "$SCRIPT_DIR/../../.." && pwd)"
+REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 
 PY_CANDIDATE="$(conda run -n colbertv2 which python 2>/dev/null || echo python)"
 if [ -x "$PY_CANDIDATE" ]; then
@@ -20,14 +20,14 @@ INDEX_PATH="${1:-indices/trec-tot-2025-colbertv2}"
 INDEX_NAME="$(basename "$INDEX_PATH")"
 QUERIES_PATH="${2:-$REPO_ROOT/data/trec-tot-2025/raw/queries/dev1-2025-queries.jsonl}"
 QRELS_PATH="${3:-$REPO_ROOT/data/trec-tot-2025/raw/qrel/dev1-2025-qrel.txt}"
-OUT_RANKING="${4:-$REPO_ROOT/replicability/colbert/results/tot_dev1.ranking.tsv}"
+OUT_RANKING="${4:-$REPO_ROOT/colbertv2/results/tot_dev1.ranking.tsv}"
 K=${5:-100}
 CHECKPOINT="${6:-colbert-ir/colbertv2.0}"
 COLLECTION="${7:-$REPO_ROOT/data/trec-tot-2025/raw/trec-tot-2025-corpus.jsonl}"
 
 mkdir -p "$(dirname "$OUT_RANKING")"
 
-LOG_DIR="${LOG_DIR:-$REPO_ROOT/replicability/colbert/logs}"
+LOG_DIR="${LOG_DIR:-$REPO_ROOT/colbertv2/logs}"
 mkdir -p "$LOG_DIR"
 TIMESTAMP=$(date +%F_%H%M%S)
 LOG="$LOG_DIR/run_eval_tot_$TIMESTAMP.log"
@@ -47,23 +47,23 @@ echo "Running search..."
 # If queries are JSONL, convert to TSV for the ColBERT `Queries` loader
 QUERIES_ARG="$QUERIES_PATH"
 if [[ "$QUERIES_PATH" == *.jsonl ]]; then
-  TMP_DIR="$REPO_ROOT/replicability/colbert/tmp"
+  TMP_DIR="$REPO_ROOT/colbertv2/tmp"
   mkdir -p "$TMP_DIR"
   CONVERTED_QUERIES="$TMP_DIR/${INDEX_NAME}_queries.tsv"
   echo "Converting JSONL queries $QUERIES_PATH -> $CONVERTED_QUERIES"
-  "$PY" "$REPO_ROOT/replicability/colbert/scripts/convert_jsonl_to_tsv.py" "$QUERIES_PATH" "$CONVERTED_QUERIES"
+  "$PY" "$REPO_ROOT/colbertv2/scripts/convert_jsonl_to_tsv.py" "$QUERIES_PATH" "$CONVERTED_QUERIES"
   QUERIES_ARG="$CONVERTED_QUERIES"
 fi
 
 # Prefer converted collection if present (produced during indexing)
 COLLECTION_ARG="$COLLECTION"
-POSSIBLE_CONV_COLL="$REPO_ROOT/replicability/colbert/tmp/${INDEX_NAME}_collection.tsv"
+POSSIBLE_CONV_COLL="$REPO_ROOT/colbertv2/tmp/${INDEX_NAME}_collection.tsv"
 if [ -f "$POSSIBLE_CONV_COLL" ]; then
   echo "Using converted collection $POSSIBLE_CONV_COLL"
   COLLECTION_ARG="$POSSIBLE_CONV_COLL"
 fi
 
-"$PY" "$REPO_ROOT/replicability/colbert/scripts/run_search.py" \
+"$PY" "$REPO_ROOT/colbertv2/scripts/run_search.py" \
   --index "$INDEX_PATH" \
   --queries "$QUERIES_ARG" \
   --k $K \
@@ -74,11 +74,11 @@ fi
   --overwrite
 
 # If an idmap exists from indexing, remap internal ids back to original pids
-IDMAP="$REPO_ROOT/replicability/colbert/tmp/${INDEX_NAME}_idmap.tsv"
+IDMAP="$REPO_ROOT/colbertv2/tmp/${INDEX_NAME}_idmap.tsv"
 CONVERTED_RANKING="${OUT_RANKING%.tsv}.origpid.tsv"
 if [ -f "$IDMAP" ]; then
   echo "Remapping internal pids in $OUT_RANKING -> $CONVERTED_RANKING using $IDMAP"
-  "$PY" "$REPO_ROOT/replicability/colbert/scripts/convert_ranking_ids.py" "$OUT_RANKING" "$IDMAP" --out "$CONVERTED_RANKING"
+  "$PY" "$REPO_ROOT/colbertv2/scripts/convert_ranking_ids.py" "$OUT_RANKING" "$IDMAP" --out "$CONVERTED_RANKING"
 else
   echo "No idmap found at $IDMAP; skipping remap"
   CONVERTED_RANKING="$OUT_RANKING"
@@ -135,7 +135,7 @@ except Exception as e:
   print('Falling back to pure-Python evaluator')
   # call compute_trec_metrics.py
   import subprocess
-  subprocess.check_call(['python3', '$REPO_ROOT/replicability/colbert/scripts/compute_trec_metrics.py', '$QRELS_PATH', '$TREC_RUN', '$JSON_OUT', '$QUERIES_PATH'])
+  subprocess.check_call(['python3', '$REPO_ROOT/colbertv2/scripts/compute_trec_metrics.py', '$QRELS_PATH', '$TREC_RUN', '$JSON_OUT', '$QUERIES_PATH'])
   # write a simple text summary from the JSON
   with open('$JSON_OUT') as f:
     obj = json.load(f)

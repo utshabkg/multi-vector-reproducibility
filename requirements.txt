@@ -16,6 +16,17 @@ ujson>=5.8.0
 # Vector search
 faiss-gpu>=1.7.4  # Use faiss-cpu if no GPU
 
+# PLAID backend (PLAID scripts in rq2, rq3, rq4) and BEIR data loading (rq3)
+# The runs used a checkout of github.com/stanford-futuredata/ColBERT at commit
+# cc4f3dc91c0b45d2d08c251d9d95178285c65f1c (setup.py version 0.2.22), installed
+# with pip install -e. Install that commit for an exact match:
+#   pip install git+https://github.com/stanford-futuredata/ColBERT.git@cc4f3dc91c0b45d2d08c251d9d95178285c65f1c
+# The ColBERT-v2 env checkout also had two small local edits: load_queries in
+# colbert/evaluation/loaders.py skips blank or malformed lines, and train() in
+# colbert/training/training.py sets batch_idx before its loop.
+colbert-ai  # tested with 0.2.22
+beir  # tested with 2.2.0
+
 # Utilities
 pyyaml>=6.0
 

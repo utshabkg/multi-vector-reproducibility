@@ -10,7 +10,7 @@ if [[ "$1" == "--test" ]] || [[ "$1" == "--dry-run" ]]; then
 fi
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-LOG_DIR="replicability/colbert/logs"
+LOG_DIR="colbertv2/logs"
 mkdir -p "$LOG_DIR"
 
 TIMESTAMP=$(date +"%Y%m%d-%H%M%S")
@@ -75,7 +75,7 @@ echo "=========================================="
 
 # Execute training with logging
 if $TEST_MODE; then
-    python -u replicability/colbert/scripts/train_colbert_tot_triples.py \
+    python -u colbertv2/scripts/train_colbert_tot_triples.py \
       --triples_file "$TRIPLES_PATH" \
       --corpus_file "$COLLECTION_PATH" \
       --queries_file "$QUERIES_PATH" \
@@ -90,7 +90,7 @@ if $TEST_MODE; then
       --warmup_steps 10 \
       2>&1 | tee "$LOG_FILE"
 else
-    python -u replicability/colbert/scripts/train_colbert_tot_triples.py \
+    python -u colbertv2/scripts/train_colbert_tot_triples.py \
       --triples_file "$TRIPLES_PATH" \
       --corpus_file "$COLLECTION_PATH" \
       --queries_file "$QUERIES_PATH" \
@@ -111,7 +111,7 @@ echo "Log saved to: $LOG_FILE"
 if [ $EXIT_CODE -eq 0 ]; then
     if $TEST_MODE; then
         echo "✅ Test successful! Ready for full training."
-        echo "Run: bash replicability/colbert/scripts/run_train_colbertv2_tot.sh"
+        echo "Run: bash colbertv2/scripts/run_train_colbertv2_tot.sh"
     else
         echo "✅ Training successful!"
     fi

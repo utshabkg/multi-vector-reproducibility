@@ -61,14 +61,14 @@ if [ "$TEST_MODE" = true ]; then
     echo "========================================"
     source $(conda info --base)/etc/profile.d/conda.sh
     conda activate constbert
-    python -u experiments/run_ablation_finetuning.py --test-mode
+    python -u experiments/rq5/run_ablation_constbert.py --test-mode
     
     # Test ColBERT
     echo ""
     echo "[2/2] Testing ColBERT pipeline..."
     echo "========================================"
     conda activate colbertv2
-    python -u experiments/run_ablation_colbert.py --test-mode
+    python -u experiments/rq5/run_ablation_colbert.py --test-mode
     
     echo ""
     echo "========================================"
@@ -89,7 +89,7 @@ elif [ "$FULL_MODE" = true ]; then
     TRIPLES_FILE="data/tot/finetuning/combined_train_dev12.triples"
     if [ ! -f "$TRIPLES_FILE" ]; then
         echo "Generating combined triples..."
-        python -u experiments/run_ablation_constbert.py --generate-triples-only
+        python -u experiments/rq5/run_ablation_constbert.py --generate-triples-only
     else
         echo "Triples already exist: $TRIPLES_FILE"
     fi
@@ -98,14 +98,14 @@ elif [ "$FULL_MODE" = true ]; then
     echo ""
     echo "[Step 2/5] Running ConstBERT fine-tuning (3 seeds)..."
     echo "========================================"
-    python -u experiments/run_ablation_constbert.py --full
+    python -u experiments/rq5/run_ablation_constbert.py --full
     
     # Step 3: Run ColBERT (3 seeds) - switch to colbertv2 env
     echo ""
     echo "[Step 3/5] Running ColBERT fine-tuning (3 seeds)..."
     echo "========================================"
     conda activate colbertv2
-    python -u experiments/run_ablation_colbert.py --full
+    python -u experiments/rq5/run_ablation_colbert.py --full
     
     # Step 4: Generate comparison table
     echo ""

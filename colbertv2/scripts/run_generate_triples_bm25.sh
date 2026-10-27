@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # Simple wrapper to run the BM25 triples generator with canonical defaults.
-# Run with: bash replicability/colbert/scripts/run_generate_triples_bm25.sh
+# Run with: bash colbertv2/scripts/run_generate_triples_bm25.sh
 
 SCRIPT_DIR=$(dirname "${BASH_SOURCE[0]}")
 PY=python3
@@ -15,7 +15,7 @@ OUT=${TOT_TRIPLES_OUT:-indices/trec-tot-2025/trec-tot-2025-triple-bm25/train.tri
 TOPK=${TOT_TOPK:-100}
 NEGS=${TOT_NEGS:-8}
 
-LOGDIR=${TOT_LOGDIR:-replicability/colbert/logs}
+LOGDIR=${TOT_LOGDIR:-colbertv2/logs}
 mkdir -p "$LOGDIR"
 LOGFILE="$LOGDIR/generate_triples_$(date +%Y%m%d-%H%M%S).log"
 

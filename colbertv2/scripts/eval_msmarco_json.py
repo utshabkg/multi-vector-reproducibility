@@ -72,7 +72,7 @@ if __name__ == '__main__':
         sys.exit(2)
     qrels = sys.argv[1]
     ranking = sys.argv[2]
-    out = sys.argv[3] if len(sys.argv) > 3 else 'replicability/colbert/results/msmarco_eval_metrics.json'
+    out = sys.argv[3] if len(sys.argv) > 3 else 'colbertv2/results/msmarco_eval_metrics.json'
 
     metrics = compute_metrics(qrels, ranking)
 

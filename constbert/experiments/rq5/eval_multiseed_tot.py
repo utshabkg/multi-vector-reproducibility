@@ -4,9 +4,9 @@ Multi-seed evaluation for fine-tuned ConstBERT and ColBERT models on ToT TEST se
 Evaluates 3 seeds per model and computes mean ± std for MRR@10, Recall@1000.
 
 Usage:
-    python experiments/eval_multiseed_tot.py --model constbert --seed 42
-    python experiments/eval_multiseed_tot.py --model colbert --seed 42
-    python experiments/eval_multiseed_tot.py --aggregate
+    python experiments/rq5/eval_multiseed_tot.py --model constbert --seed 42
+    python experiments/rq5/eval_multiseed_tot.py --model colbert --seed 42
+    python experiments/rq5/eval_multiseed_tot.py --aggregate
 """
 
 import sys

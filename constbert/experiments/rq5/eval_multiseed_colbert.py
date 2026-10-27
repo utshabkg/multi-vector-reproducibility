@@ -4,10 +4,10 @@ Multi-seed evaluation for fine-tuned ColBERT models on ToT TEST set.
 Converts checkpoints, builds indices, evaluates, and aggregates results.
 
 Usage:
-    python experiments/eval_multiseed_colbert.py --seed 42
-    python experiments/eval_multiseed_colbert.py --seed 123
-    python experiments/eval_multiseed_colbert.py --seed 456
-    python experiments/eval_multiseed_colbert.py --aggregate
+    python experiments/rq5/eval_multiseed_colbert.py --seed 42
+    python experiments/rq5/eval_multiseed_colbert.py --seed 123
+    python experiments/rq5/eval_multiseed_colbert.py --seed 456
+    python experiments/rq5/eval_multiseed_colbert.py --aggregate
 """
 
 import os
@@ -42,7 +42,7 @@ TEST_QRELS = Path("data/trec-tot-2025/qrel/test-2025-qrel.txt")
 def convert_checkpoint_to_hf(seed: int) -> Path:
     """Convert .pt checkpoint to HuggingFace format."""
     
-    checkpoint_dir = COLBERT_COPY / f"colbert-replicability/colbert/models/colbertv2-tot-seed{seed}"
+    checkpoint_dir = COLBERT_COPY / f"models/colbertv2-tot-seed{seed}"
     pt_file = checkpoint_dir / "best_model.pt"
     hf_dir = INDICES_ROOT / f"colbertv2-fine-tot-seed{seed}-hf"
     
@@ -93,7 +93,7 @@ def build_plaid_index(seed: int, hf_checkpoint: Path) -> Path:
     logger.info(f"  Index: {index_path}")
     
     # Use the indexing script
-    script_path = COLBERT_COPY / "colbert-replicability/colbert/scripts/index_colbertv2_tot.sh"
+    script_path = COLBERT_COPY / "scripts/index_colbertv2_tot.sh"
     
     cmd = [
         "bash", str(script_path),
@@ -169,7 +169,7 @@ def evaluate_index(seed: int, index_path: Path) -> dict:
         )
         
         # Load ID mapping
-        idmap_path = COLBERT_COPY / f"colbert-replicability/colbert/tmp/{index_path.name}_idmap.tsv"
+        idmap_path = COLBERT_COPY / f"tmp/{index_path.name}_idmap.tsv"
         internal_to_original = {}
         if idmap_path.exists():
             with open(idmap_path) as f:

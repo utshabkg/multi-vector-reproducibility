@@ -11,7 +11,7 @@ Key Optimizations:
 5. Vectorized operations throughout
 
 Usage:
-    python experiments/11_beir_evaluation.py --model constbert --dataset scidocs
+    python experiments/rq3/11_beir_evaluation.py --model constbert --dataset scidocs
 """
 
 import argparse
@@ -470,7 +470,7 @@ def main():
     parser.add_argument('--query-batch-size', type=int, default=512,
                        help='Query search batch size (increased for speed)')
     parser.add_argument('--num-workers', type=int, default=32,
-                       help='DataLoader workers (use ~30-50% of CPU cores)')
+                       help='DataLoader workers (use ~30-50%% of CPU cores)')
     parser.add_argument('--nlist', type=int, default=256,
                        help='FAISS nlist parameter')
     parser.add_argument('--nprobe', type=int, default=64,

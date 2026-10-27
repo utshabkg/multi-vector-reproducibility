@@ -4,10 +4,10 @@
 
 set -e  # Exit on error
 
-source ~/anaconda3/etc/profile.d/conda.sh
+source $(conda info --base)/etc/profile.d/conda.sh
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-cd "$SCRIPT_DIR"
+cd "$SCRIPT_DIR/.."
 
 # Use constbert conda environment
 CONDA_ENV="constbert"
@@ -51,7 +51,7 @@ LARGE_DATASETS="nq hotpotqa dbpedia-entity fever climate-fever"
 #     echo "========================================"
 #     echo "Dataset: $dataset"
 #     echo "========================================"
-#     conda run -n $CONDA_ENV python -u experiments/13_beir_colbertv2_evaluation.py \
+#     conda run -n $CONDA_ENV python -u experiments/rq3/13_beir_colbertv2_evaluation.py \
 #         --dataset "$dataset" \
 #         --data-dir "$DATA_DIR" \
 #         --index-dir "$INDEX_DIR" \
@@ -68,7 +68,7 @@ LARGE_DATASETS="nq hotpotqa dbpedia-entity fever climate-fever"
 #     echo "========================================"
 #     echo "Dataset: $dataset"
 #     echo "========================================"
-#     conda run -n $CONDA_ENV python -u experiments/13_beir_colbertv2_evaluation.py \
+#     conda run -n $CONDA_ENV python -u experiments/rq3/13_beir_colbertv2_evaluation.py \
 #         --dataset "$dataset" \
 #         --data-dir "$DATA_DIR" \
 #         --index-dir "$INDEX_DIR" \
@@ -86,7 +86,7 @@ for dataset in $LARGE_DATASETS; do
     echo "========================================"
     echo "Dataset: $dataset"
     echo "========================================"
-    python -u experiments/13_beir_colbertv2_evaluation.py \
+    python -u experiments/rq3/13_beir_colbertv2_evaluation.py \
         --dataset "$dataset" \
         --data-dir "$DATA_DIR" \
         --index-dir "$INDEX_DIR" \
