@@ -1,3 +1,5 @@
+> **Note.** These are working notes written during the project. Some numbers and plans predate the final experiments. The published paper ([doi.org/10.1145/3805712.3808561](https://doi.org/10.1145/3805712.3808561)) is the authoritative record.
+
 # Issues, Insights, and Author Communication
 
 This document captures the challenges faced during reproduction, novel insights discovered, and author clarifications that should be included in the reproducibility paper.

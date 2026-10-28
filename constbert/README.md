@@ -1,6 +1,6 @@
 # ConstBERT Experiments
 
-This directory contains all experiment code for evaluating ConstBERT (`pinecone/ConstBERT`), a multi-vector dense retrieval model with a fixed 32-vector document representation.
+This directory holds the experiment code for ConstBERT (`pinecone/ConstBERT`), a multi-vector retrieval model that pools each document into exactly 32 vectors of 128 dimensions. It also holds four ColBERT-v2 experiment scripts (marked below), two ColBERT-v2 wrappers in `scripts/` (`run_colbertv2_beir_evaluation.sh` and `run_colbert_multiseed_eval.sh`) and the result files for both models.
 
 ## Core Library
 
@@ -10,62 +10,104 @@ This directory contains all experiment code for evaluating ConstBERT (`pinecone/
 | `models/faiss_index.py` | FAISS-IVF index for approximate nearest neighbor search |
 | `data/loaders.py` | MS MARCO and TREC DL data loaders |
 | `data/tot_loader.py` | TREC ToT 2025 data loader |
-| `evaluation/metrics.py` | MRR@k, Recall@k, nDCG@k, MAP computation |
+| `evaluation/metrics.py` | MRR@k, Recall@k, nDCG@k, precision and MAP computation |
 
 ## Experiments by Research Question
 
+The research question names follow the paper.
+
 ### RQ1: Implementation Correctness (`experiments/rq1/`)
 
-Validates ConstBERT's implementation by comparing against original paper metrics on standard benchmarks.
+Asks whether the reported in-domain effectiveness can be reproduced on MS MARCO. This folder covers ConstBERT on MS MARCO and on TREC DL 2019 and 2020. The ColBERT-v2 MS MARCO run is in `colbertv2/`.
 
-- `01_msmarco_faiss_eval.py` — MS MARCO Passage Ranking evaluation (FAISS-IVF backend)
-- `02_trec_dl_faiss_eval.py` — TREC DL 2019 & 2020 evaluation
-- `03_storage_analysis.py` — Embedding storage size analysis
+- `01_msmarco_faiss_eval.py`: MS MARCO passage ranking with the FAISS-IVF backend
+- `02_trec_dl_faiss_eval.py`: TREC DL 2019 and 2020, reusing the index built by `01_msmarco_faiss_eval.py`
+- `03_storage_analysis.py`: Embedding storage size analysis. Its input paths default to absolute paths on the authors' machine, so pass your own with `--embeddings`, `--faiss-index`, `--faiss-pkl` and `--plaid-index`.
 
-### RQ2: PLAID Engine Compatibility (`experiments/rq2/`)
+### RQ2: Backend Robustness (`experiments/rq2/`)
 
-Tests whether ConstBERT's fixed 32-vector design is compatible with ColBERT-v2's PLAID retrieval engine.
+Asks how retrieval backends affect reproducibility when parameters are undocumented. Most scripts here run ConstBERT with PLAID, for comparison with the FAISS-IVF runs.
 
-- `build_plaid_index_msmarco.py` — Build PLAID index from ConstBERT embeddings
-- `build_plaid_index_tot.py` — Build PLAID index for ToT corpus
-- `05_msmarco_plaid_eval.py` — MS MARCO evaluation with PLAID backend
-- `06_msmarco_plaid_ncells.py` — PLAID nprobe/ncells parameter analysis
-- `07_exact_maxsim_verify.py` — Verify exact MaxSim matches PLAID scores
-- `08_trec_dl_plaid_eval.py` — TREC DL evaluation with PLAID backend
-- `17_centroid_coverage_analysis.py` — Centroid assignment coverage analysis
-- `18_plaid_parameter_sweep.py` — PLAID configuration parameter sweep
+- `build_plaid_index_msmarco.py`: Build a PLAID index for MS MARCO from precomputed ConstBERT embeddings. It reads `constbert_msmarco_embeddings.npy` and `constbert_msmarco_faiss_index.pkl` from `indices/msmarco-passage/msmarco-passage-constbert/`. With its defaults, `01_msmarco_faiss_eval.py` writes these files to `data/msmarco-passage/` and `indices/`, so copy or link them into that folder first.
+- `build_plaid_index_tot.py`: Build a PLAID index for the ToT corpus from precomputed ConstBERT embeddings. Its default inputs are the `embeddings.npy` and `metadata.npy` files that `04_tot_faiss_eval.py` writes to `indices/trec-tot-2025/constbert_tot_faiss_index/`.
+- `05_msmarco_plaid_eval.py`: MS MARCO evaluation with PLAID
+- `06_msmarco_plaid_ncells.py`: MS MARCO evaluation with PLAID at ncells=16
+- `07_exact_maxsim_verify.py`: Exact brute-force MaxSim on a subset of MS MARCO dev queries (not reported in the paper). It reads the same embeddings file as `build_plaid_index_msmarco.py`.
+- `08_trec_dl_plaid_eval.py`: TREC DL 2019 and 2020 evaluation with PLAID (not reported in the paper)
+- `17_centroid_coverage_analysis.py`: Centroid coverage analysis
+- `18_plaid_parameter_sweep.py`: PLAID parameter sweep over ncells and the centroid score threshold
 
-### RQ3: Cross-Domain Generalization (`experiments/rq3/`)
+### RQ3: Domain Generalization (`experiments/rq3/`)
 
-Evaluates zero-shot transfer performance across 13 BEIR benchmark datasets.
+Out-of-domain evaluation on 13 BEIR datasets, for ConstBERT with FAISS-IVF and with PLAID, and for ColBERT-v2.
 
-- `11_beir_evaluation.py` — ConstBERT FAISS evaluation on all BEIR datasets
-- `12-1_build_beir_plaid_indices.py` — Build PLAID indices for BEIR
-- `12-2_build_ivf_for_beir.py` — Build IVF indices for BEIR PLAID
-- `12-3_beir_plaid_eval.py` — ConstBERT PLAID evaluation on BEIR
-- `13_beir_colbertv2_evaluation.py` — ColBERT-v2 BEIR evaluation (comparison)
-- `15_verify_faiss_hypothesis.py` — FAISS nlist sensitivity hypothesis test
-- `compare_beir_backends.py` — Compare FAISS vs PLAID backends on BEIR
+- `11_beir_evaluation.py`: ConstBERT FAISS-IVF evaluation on BEIR. `--model` and `--dataset` are required, even with `--all`, which runs all 13 datasets and writes `11_beir_constbert_summary.json`. `scripts/run_beir_evaluation.sh` runs the 13 datasets one at a time.
+- `12-1_build_beir_plaid_indices.py`: Encode the BEIR corpora with ConstBERT and build PLAID indices
+- `12-2_build_ivf_for_beir.py`: Add the IVF files that PLAID search needs to the BEIR PLAID indices
+- `12-3_beir_plaid_eval.py`: ConstBERT PLAID evaluation on BEIR
+- `13_beir_colbertv2_evaluation.py`: ColBERT-v2 BEIR evaluation (ColBERT-v2 script)
+- `15_verify_faiss_hypothesis.py`: FAISS-IVF nlist test on FEVER (not reported in the paper)
+- `compare_beir_backends.py`: Compare the PLAID and FAISS-IVF results on BEIR. It reads and writes `results/` relative to the working directory, so run it from `constbert/`.
 
-### RQ4: Long-Query Retrieval (`experiments/rq4/`)
+### RQ4: Structural Generalization (`experiments/rq4/`)
 
-Examines ConstBERT's behavior on verbose, descriptive queries from TREC ToT 2025.
+Zero-shot evaluation of ConstBERT on the long narrative queries of TREC ToT 2025. The ColBERT-v2 ToT TEST run is `experiments/rq5/eval_colbert_base_test.py`.
 
-- `04_tot_faiss_eval.py` — ToT evaluation with FAISS backend
-- `09_tot_plaid_eval.py` — ToT evaluation with PLAID backend
-- `15_query_length_ablation.py` — Query length truncation ablation study
-- `16_exact_maxsim_tot.py` — Exact MaxSim verification on ToT
+- `04_tot_faiss_eval.py`: ToT evaluation with FAISS-IVF (see [Known Issues](#known-issues))
+- `09_tot_plaid_eval.py`: ToT evaluation with PLAID
+- `15_query_length_ablation.py`: Query length ablation that truncates ToT queries to fixed word counts. It loads a saved `ConstBERTFAISSIndex` (the files `index` and `index.faiss`) from `indices/trec-tot-2025/constbert_tot_faiss_index/` and does not build one.
+- `16_exact_maxsim_tot.py`: Exact brute-force MaxSim on sampled ToT queries (see [Known Issues](#known-issues))
 
-### RQ5: Domain-Specific Fine-Tuning (`experiments/rq5/`)
+### RQ5: Adaptation Potential (`experiments/rq5/`)
 
-Fine-tunes both ConstBERT and ColBERT-v2 on TREC ToT training data.
+Fine-tunes ConstBERT and ColBERT-v2 on TREC ToT and evaluates the fine-tuned models. This folder also holds the zero-shot ColBERT-v2 evaluation on ToT TEST.
 
-- `10_generate_triples_simple.py` — Generate BM25-negative training triples
-- `10_finetune_constbert_tot.py` — Fine-tune ConstBERT on ToT
-- `10_eval_finetuned_tot_test.py` — Evaluate fine-tuned ConstBERT
-- `run_multiseed_finetuning.py` — Multi-seed fine-tuning runner
-- `eval_multiseed_tot.py` — Evaluate multi-seed ConstBERT models
-- `eval_multiseed_colbert.py` — Evaluate multi-seed ColBERT-v2 models
-- `run_ablation_constbert.py` — ConstBERT fine-tuning ablation
-- `run_ablation_colbert.py` — ColBERT-v2 fine-tuning ablation
-- `eval_colbert_base_test.py` — ColBERT-v2 base (unfinetuned) evaluation on ToT
+- `10_generate_triples_simple.py`: Generate BM25 hard-negative training triples. `--corpus_file`, `--queries_file`, `--qrels_file` and `--output_file` are required. It needs the `rank-bm25` package (`pip install rank-bm25`), which the root `requirements.txt` does not list. `scripts/run_constbert_finetuning.sh` does not call this script, and it stops unless the triples already exist at `indices/trec-tot-2025/trec-tot-2025-triple-bm25/train.triples` under `constbert/`.
+- `10_finetune_constbert_tot.py`: Fine-tune ConstBERT on ToT. `--triples_file`, `--corpus_file` and `--queries_file` are required. `scripts/run_constbert_finetuning.sh` passes them.
+- `10_eval_finetuned_tot_test.py`: Evaluate the fine-tuned ConstBERT checkpoint on ToT (`--splits`, default `test`). It reads the checkpoint from `checkpoints/constbert_tot_finetuned/` under the working directory.
+- `run_multiseed_finetuning.py`: Launch three fine-tuning runs of each model. It starts every job inside `constbert/` with input paths set in the script: `indices/processed/trec-tot-2025-triple-bm25/train.triples` and files under `data/trec-tot-2025/raw/`. Its ColBERT-v2 jobs also read `data/trec-tot-2025/tot_bm25_top1000.tsv`, which no script here creates. A failed job does not stop the script. `scripts/run_multiseed_finetuning.sh` launches the runs with the wrapper layout described below.
+- `eval_multiseed_tot.py`: Evaluate the three fine-tuned ConstBERT models on ToT TEST. `--aggregate` summarizes both models.
+- `eval_multiseed_colbert.py`: Evaluate the three fine-tuned ColBERT-v2 models on ToT TEST (ColBERT-v2 script)
+- `run_ablation_constbert.py`: ConstBERT fine-tuning ablation
+- `run_ablation_colbert.py`: ColBERT-v2 fine-tuning ablation (ColBERT-v2 script, runs in the `colbertv2` conda environment)
+- `eval_colbert_base_test.py`: Zero-shot ColBERT-v2 (`colbert-ir/colbertv2.0`) evaluation on ToT TEST (ColBERT-v2 script)
+
+## Wrapper Scripts
+
+`scripts/` holds bash wrappers that call the experiment scripts above. Each wrapper changes into `constbert/` first, so relative paths such as `data/`, `indices/`, `checkpoints/`, `results/` and `logs/` resolve inside `constbert/`. The one exception is the ColBERT-v2 training step in `run_multiseed_finetuning.sh`, which runs from `colbertv2/`.
+
+The multi-seed ToT TEST evaluation runs through `run_multiseed_eval.sh` (ConstBERT) and `run_colbert_multiseed_eval.sh` (ColBERT-v2). Two wrappers do not finish their job (see [Known Issues](#known-issues)).
+
+## Data
+
+The wrappers read datasets from `constbert/data/` (for example `constbert/data/beir/` or `constbert/data/trec-tot-2025/`), next to the Python loaders in that folder. The ColBERT-v2 training step of `scripts/run_multiseed_finetuning.sh` is the exception. It reads the ToT corpus and queries from `colbertv2/data/trec-tot-2025/` and the triples from `colbertv2/indices/trec-tot-2025/trec-tot-2025-triple-bm25/`. Most experiment scripts resolve `data/` against the working directory, so when you run them from the repository root they read the root `data/` folder. These scripts use paths under `constbert/` wherever you launch them:
+
+- `experiments/rq5/run_multiseed_finetuning.py` starts every job inside `constbert/`.
+- `experiments/rq3/15_verify_faiss_hypothesis.py` reads BEIR from `constbert/data/beir/`.
+- `experiments/rq5/run_ablation_constbert.py` and `run_ablation_colbert.py` keep their training triples in `constbert/data/tot/finetuning/`. They read the ToT files from `data/trec-tot-2025/` under the working directory.
+
+The download scripts in the root `scripts/` folder write to `data/` under the current directory by default, so pass the target folder as their first argument, for example `bash scripts/download_beir.sh constbert/data/beir` from the repository root. Two of them leave gaps:
+
+- `scripts/download_msmarco.sh` does not provide `queries.dev.small.tsv`, which `data/loaders.py` reads for the dev queries and `experiments/rq2/18_plaid_parameter_sweep.py` reads directly. It also skips `msmarco-test2019-queries.tsv` and `msmarco-test2020-queries.tsv`, which `02_trec_dl_faiss_eval.py` and `08_trec_dl_plaid_eval.py` read. Add these files to the MS MARCO folder yourself.
+- `scripts/download_tot.sh` downloads nothing. It prints a list of expected files, but its DEV file names differ from the ones `data/tot_loader.py` reads, and it lists no TRAIN files. The loader and the RQ5 wrappers read these files from the ToT folder, for the splits `train`, `dev1`, `dev2`, `dev3` and `test`:
+  - `trec-tot-2025-corpus.jsonl`
+  - `queries/<split>-2025-queries.jsonl`
+  - `qrel/<split>-2025-qrel.txt`
+
+See [Setup](../README.md#setup) in the top-level README for how to get these files.
+
+## Results
+
+`results/` holds the JSON outputs for ConstBERT and for the ColBERT-v2 scripts marked above. `results/multiseed/` holds the ToT TEST evaluation of each of the three fine-tuning runs per model. Some files hold results that the paper does not report, such as `08_trec_dl_plaid_*.json`, `10_finetune-results_tot_test.json`, `11_beir_constbert_fever_nlist4096.json`, `12_beir_plaid_summary_nbit-4_threshold-0.4.json` and `14_beir_backend_comparison.json`.
+
+## Known Issues
+
+Two RQ4 scripts do not run to completion as committed:
+
+- `experiments/rq4/04_tot_faiss_eval.py` looks for `index.pkl` and `index.faiss`, but `ConstBERTFAISSIndex.save()` writes the pickle as `index`. So it treats an index saved by this repository as missing and tries to build one, and that build passes arguments that `models/faiss_index.py` does not accept. Its retrieval loop also unpacks the return value of `ConstBERTFAISSIndex.search()` in a form that raises a `ValueError`.
+- `experiments/rq4/16_exact_maxsim_tot.py` calls `TRECToTDataLoader.load_documents()`, which `data/tot_loader.py` does not define, so it stops with an `AttributeError` before it scores any document.
+
+Two wrappers in `scripts/` do not finish their job either:
+
+- `scripts/run_constbert_finetuning.sh` fine-tunes ConstBERT and saves the model to `constbert/checkpoints/constbert_tot_finetuned/`, then stops at its evaluation step. That step writes and runs `experiments/10_eval_finetuned_constbert.py`, which creates a `ConstBERTFAISSIndex` with arguments that `models/faiss_index.py` does not accept, so it ends with a `TypeError`. To evaluate the saved model, run `experiments/rq5/10_eval_finetuned_tot_test.py` from `constbert/`.
+- `scripts/eval_multiseed_models.sh` evaluates nothing. It passes flags that `10_eval_finetuned_tot_test.py` does not accept, hides the error and prints `(skipped - evaluation script needs update)`. Its ColBERT-v2 loop runs no command. The multi-seed evaluation runs through `run_multiseed_eval.sh` and `run_colbert_multiseed_eval.sh` instead. `eval_multiseed_tot.py` skips a run whose result file already exists in `results/multiseed/`, and the tracked result files are there. `eval_multiseed_colbert.py` looks for its result file only after two earlier steps. It converts the fine-tuned checkpoint in `colbertv2/models/`, which is not tracked, unless a converted copy already exists. Then it needs a ColBERT-v2 index of that model (see `colbertv2/README.md`). If either is missing, `run_colbert_multiseed_eval.sh` stops at its first run, even though the tracked result files are there.

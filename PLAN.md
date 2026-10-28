@@ -1,3 +1,5 @@
+> **Note.** These are working notes written during the project. Some numbers and plans predate the final experiments. The published paper ([doi.org/10.1145/3805712.3808561](https://doi.org/10.1145/3805712.3808561)) is the authoritative record.
+
 # ConstBERT Reproducibility Study — Research Plan
 
 **Paper**: "Efficient Constant-Space Multi-Vector Retrieval" (ECIR 2025)  
