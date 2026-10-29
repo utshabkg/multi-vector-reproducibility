@@ -333,9 +333,9 @@ def main():
     # Save codec
     os.makedirs(args.output_path, exist_ok=True)
     
-    centroids_path = os.path.join(args.output_path, "centroids.pt")
-    torch.save(codec.centroids, centroids_path)
-    print(f"✅ Saved centroids to {centroids_path}")
+    # Writes centroids.pt, avg_residual.pt and buckets.pt, which ColBERT needs to load the index
+    codec.save(args.output_path)
+    print(f"✅ Saved centroids, avg_residual and buckets to {args.output_path}")
     
     codec_path = os.path.join(args.output_path, "codec.pt")
     torch.save(codec, codec_path)
@@ -375,6 +375,25 @@ def main():
     with open(plan_path, 'w') as f:
         json.dump(plan, f, indent=2)
     print(f"✅ Saved plan to {plan_path}")
+    
+    # Save metadata.json, which ColBERT reads to load the index (same fields as 12-2_build_ivf_for_beir.py).
+    # ColBERT writes ivf.pid.pt from ivf.pt the first time it loads the index.
+    metadata = {
+        'num_chunks': num_chunks,
+        'num_partitions': args.num_partitions,
+        'num_embeddings': sum(doclens[:num_chunks * args.chunk_size]),  # only the chunks written above
+        'avg_doclen': 32,
+        'config': {
+            'doc_maxlen': config.doc_maxlen,
+            'nbits': config.nbits,
+            'dim': config.dim,
+            'kmeans_niters': config.kmeans_niters,
+        }
+    }
+    metadata_path = os.path.join(args.output_path, "metadata.json")
+    with open(metadata_path, 'w') as f:
+        json.dump(metadata, f, indent=2)
+    print(f"✅ Saved metadata to {metadata_path}")
     
     # Build IVF
     build_ivf(args.output_path, args.num_partitions, num_chunks)

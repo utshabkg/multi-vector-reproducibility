@@ -62,6 +62,9 @@ def evaluate_beir_with_plaid(dataset_name: str,
                              index_root: str,
                              data_dir: str,
                              k: int = 1000,
+                             ncells: int = 16,
+                             centroid_score_threshold: float = 0.3,
+                             ndocs: int = 8192,
                              batch_size: int = 128,
                              output_dir: str = "results"):
     """
@@ -72,6 +75,9 @@ def evaluate_beir_with_plaid(dataset_name: str,
         index_root: Root directory containing PLAID indices
         data_dir: Directory containing BEIR data
         k: Number of results per query
+        ncells: Number of IVF cells to probe
+        centroid_score_threshold: PLAID centroid score threshold
+        ndocs: Max candidate docs
         batch_size: Query encoding batch size
         output_dir: Directory to save results
 
@@ -122,18 +128,9 @@ def evaluate_beir_with_plaid(dataset_name: str,
 
     # Configure search parameters
     config = ColBERTConfig()
-    if k <= 10:
-        config.ncells = 1
-        config.centroid_score_threshold = 0.5
-        config.ndocs = 256
-    elif k <= 100:
-        config.ncells = 2
-        config.centroid_score_threshold = 0.45
-        config.ndocs = 1024
-    else:
-        config.ncells = 4
-        config.centroid_score_threshold = 0.4
-        config.ndocs = max(k * 4, 4096)
+    config.ncells = ncells
+    config.centroid_score_threshold = centroid_score_threshold
+    config.ndocs = ndocs
 
     print(f"   Search config: ncells={config.ncells}, ndocs={config.ndocs}, threshold={config.centroid_score_threshold}")
 
@@ -234,6 +231,15 @@ def main():
                        help='Directory containing BEIR data')
     parser.add_argument('--k', type=int, default=1000,
                        help='Number of results per query')
+    # Defaults are the settings recorded in the Table 3 result files (12_beir_plaid_<dataset>.json), all run with k=1000.
+    # They do not change with --k. PLAID keeps ndocs // 4 candidates, so use --ndocs of at least 4 * k when k > 2048.
+    # PLAID's documented defaults for k=1000 are --ncells 4 --centroid_score_threshold 0.4 --ndocs 4096.
+    parser.add_argument('--ncells', type=int, default=16,
+                       help='Number of IVF cells to probe')
+    parser.add_argument('--centroid_score_threshold', type=float, default=0.3,
+                       help='PLAID centroid score threshold')
+    parser.add_argument('--ndocs', type=int, default=8192,
+                       help='Max candidate docs')
     parser.add_argument('--batch_size', type=int, default=128,
                        help='Query encoding batch size')
     parser.add_argument('--output', type=str, default='results',
@@ -258,6 +264,7 @@ def main():
     print(f"  - Index root: {args.index_root}")
     print(f"  - Data directory: {args.data_dir}")
     print(f"  - k: {args.k}")
+    print(f"  - ncells={args.ncells}, ndocs={args.ndocs}, threshold={args.centroid_score_threshold}")
     print(f"  - Batch size: {args.batch_size}")
     print(f"  - Output: {args.output}\n")
 
@@ -277,6 +284,9 @@ def main():
                 index_root=args.index_root,
                 data_dir=args.data_dir,
                 k=args.k,
+                ncells=args.ncells,
+                centroid_score_threshold=args.centroid_score_threshold,
+                ndocs=args.ndocs,
                 batch_size=args.batch_size,
                 output_dir=args.output
             )

@@ -346,6 +346,15 @@ def build_plaid_index(embeddings_path, metadata_path, index_path, config, max_do
     np.save(doc_ids_path, doc_ids)
     print(f"  ✅ Document IDs saved ({len(doc_ids):,} documents)")
     
+    # Build IVF (ivf.pt, ivf.pid.pt) and metadata.json, which ColBERT needs to load the index.
+    # Reuses build_ivf() from rq3/12-2_build_ivf_for_beir.py (its file name cannot be imported directly)
+    import importlib.util
+    build_ivf_script = Path(__file__).resolve().parent.parent / 'rq3' / '12-2_build_ivf_for_beir.py'
+    spec = importlib.util.spec_from_file_location('build_ivf_for_beir', build_ivf_script)
+    build_ivf_module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(build_ivf_module)
+    build_ivf_module.build_ivf(index_path, force=True)
+    
     # Calculate total index size
     import subprocess
     result = subprocess.run(['du', '-sh', index_path], capture_output=True, text=True)

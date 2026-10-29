@@ -124,7 +124,7 @@ def main():
         logger.info(f"  Storage: {emb_size:.2f} GB (embeddings) + {meta_size:.2f} GB (metadata)")
     
     # Check if index exists
-    if Path(f"{index_path}.pkl").exists() and Path(f"{index_path}.faiss").exists():
+    if Path(index_path).exists() and Path(f"{index_path}.faiss").exists():
         logger.info(f"\n[3/5] Loading pre-built FAISS index from {index_path}...")
         logger.info("  This may take 2-3 minutes...")
         start_time = time.time()
@@ -136,18 +136,14 @@ def main():
         logger.info("\n[3/5] Building FAISS IVF index...")
         logger.info("  This enables efficient retrieval on 6.4M documents")
         
-        # Build index
-        index = ConstBERTFAISSIndex(
-            embedding_dim=128,
-            num_vectors_per_doc=32,
-            nlist=4096,  # Same as MS-MARCO
-            nprobe=128,  # Same as MS-MARCO
-            use_gpu=torch.cuda.is_available()
-        )
+        # Build index. For corpora over 100k documents, models/faiss_index.py builds
+        # an IVF index with nlist=4096, nprobe=128 and a 10M-vector training sample
+        # (same as MS-MARCO). Smaller corpora get a flat index.
+        index = ConstBERTFAISSIndex(use_gpu=torch.cuda.is_available())
         
         logger.info("  Adding documents to index (with IVF training)...")
         start_time = time.time()
-        index.add_documents(embeddings, doc_ids, train_sample_size=10_000_000)
+        index.add_documents(doc_ids, embeddings)
         build_time = time.time() - start_time
         logger.info(f"  Index built in {build_time/60:.1f} minutes!")
         
@@ -157,7 +153,7 @@ def main():
         logger.info("  Index saved!")
         
         # Calculate storage
-        pkl_size = Path(f"{index_path}.pkl").stat().st_size / (1024**3)
+        pkl_size = Path(index_path).stat().st_size / (1024**3)
         faiss_size = Path(f"{index_path}.faiss").stat().st_size / (1024**3)
         logger.info(f"  Storage: {pkl_size:.2f} GB (metadata) + {faiss_size:.2f} GB (FAISS index)")
     
@@ -184,19 +180,19 @@ def main():
         start_time = time.time()
         
         # Retrieve
-        results = index.search(
+        doc_ids_batch, scores_batch = index.search(
             query_embeddings[i:i+1],
             k=1000,
             candidate_mult=10  # Higher for better accuracy
-        )[0]
+        )
         
         query_time = time.time() - start_time
         query_times.append(query_time)
         
-        # Store results as {doc_id: score}
+        # Store results as {doc_id: score} (single query, so take the first list)
         all_results[qid] = {
             doc_id: float(score) 
-            for doc_id, score in results
+            for doc_id, score in zip(doc_ids_batch[0], scores_batch[0])
         }
     
     # Compute metrics

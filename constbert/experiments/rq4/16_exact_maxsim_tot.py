@@ -115,10 +115,14 @@ def run_exact_maxsim_evaluation(num_queries: int = 100, seed: int = 42):
     loader = TRECToTDataLoader()
     test_queries = loader.load_queries("test")
     test_qrels = loader.load_qrels("test")
-    all_docs = loader.load_documents()
+    
+    # Stored ConstBERT document embeddings and doc IDs, as saved by 04_tot_faiss_eval.py
+    index_dir = Path("indices/trec-tot-2025/constbert_tot_faiss_index")
+    embeddings = np.load(index_dir / "embeddings.npy")  # (num_docs, 32, 128) float16
+    doc_ids = np.load(index_dir / "metadata.npy", allow_pickle=True).tolist()
     
     logger.info(f"  Loaded {len(test_queries)} test queries")
-    logger.info(f"  Loaded {len(all_docs):,} documents")
+    logger.info(f"  Loaded {len(doc_ids):,} documents")
     logger.info(f"  {len(test_qrels)} queries have relevance judgments")
     
     # Sample queries
@@ -137,18 +141,15 @@ def run_exact_maxsim_evaluation(num_queries: int = 100, seed: int = 42):
     logger.info(f"\n[3/4] Encoding {len(query_ids)} queries...")
     query_texts = [test_queries[qid] for qid in query_ids]
     Q_all = model.encode_queries(query_texts, batch_size=128, show_progress=True)
-    Q_all = torch.from_numpy(Q_all).to(device)  # (num_queries, 32, 128)
+    # Scoring runs on CPU: the document embeddings (~52 GB) do not fit in GPU memory
+    Q_all = torch.from_numpy(Q_all)  # (num_queries, 32, 128)
     
     logger.info(f"  Query embeddings: {Q_all.shape}")
     
-    # Encode ALL documents (for exact MaxSim)
-    logger.info(f"\n  Encoding {len(all_docs):,} documents...")
-    doc_ids = list(all_docs.keys())
-    doc_texts = [all_docs[did] for did in doc_ids]
-    
-    # Encode in batches
-    D_all = model.encode_documents(doc_texts, batch_size=128, show_progress=True)
-    D_all = torch.from_numpy(D_all).to(device)  # (num_docs, 32, 128)
+    # Use the stored embeddings of ALL documents (for exact MaxSim). They stay float16
+    # in memory, and each document is cast to float32 when it is scored (exact cast)
+    logger.info(f"\n  Using stored embeddings of {len(doc_ids):,} documents...")
+    D_all = torch.from_numpy(embeddings)  # (num_docs, 32, 128)
     
     logger.info(f"  Document embeddings: {D_all.shape}")
     
@@ -168,7 +169,7 @@ def run_exact_maxsim_evaluation(num_queries: int = 100, seed: int = 42):
         # Score ALL documents (exact MaxSim)
         scores = []
         for doc_idx in range(len(doc_ids)):
-            D = D_all[doc_idx]  # (32, 128)
+            D = D_all[doc_idx].float()  # (32, 128)
             score = compute_exact_maxsim(Q, D)
             scores.append(score)
         
@@ -219,7 +220,7 @@ def run_exact_maxsim_evaluation(num_queries: int = 100, seed: int = 42):
         "experiment": "Exact MaxSim Upper Bound",
         "seed": seed,
         "num_queries": len(query_ids),
-        "num_documents": len(all_docs),
+        "num_documents": len(doc_ids),
         "metrics": metrics,
         "comparison": {
             "faiss_mrr@10": 0.0427,
