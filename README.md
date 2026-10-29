@@ -90,23 +90,24 @@ Short script paths such as `rq2/...` are relative to `constbert/experiments/`. R
 | RQ1 | Table 1, ConstBERT | `constbert/experiments/rq1/01_msmarco_faiss_eval.py` | `constbert/results/01_msmarco_faiss.json` |
 | RQ1 | Table 1, ColBERT-v2 | `colbertv2/scripts/run_eval_msmarco.sh`, then `colbertv2/scripts/eval_msmarco_json.py` | `colbertv2/results/msmarco_eval_metrics.json` |
 | RQ1 | TREC DL 2019 and 2020 (Sec. 5.1.4) | `constbert/experiments/rq1/02_trec_dl_faiss_eval.py` | `constbert/results/02_trec_dl2019_faiss.json`, `constbert/results/02_trec_dl2020_faiss.json` |
-| RQ2 | Table 2, MS MARCO, PLAID-4 | `rq2/build_plaid_index_msmarco.py`, an IVF step (see [RQ2](#rq2-backend-robustness)), `rq2/05_msmarco_plaid_eval.py` | `05_msmarco_plaid.json` |
-| RQ2 | Table 2, MS MARCO, PLAID-16 | `rq2/06_msmarco_plaid_ncells.py` (needs the IVF step, see [RQ2](#rq2-backend-robustness)) | `06_msmarco_plaid_ncells16.json` |
-| RQ2 | Table 2, ToT, PLAID-16 | `rq2/build_plaid_index_tot.py`, `rq4/09_tot_plaid_eval.py` (ColBERT cannot load the index this builder writes, see [RQ4](#rq4-structural-generalization-trec-tot)) | `09_tot_plaid_ncells16.json` |
-| RQ2 | PLAID parameter search (Sec. 5.2.2) | `rq2/18_plaid_parameter_sweep.py` (needs the IVF step, see [RQ2](#rq2-backend-robustness)) | `18_plaid_parameter_sweep.json` |
+| RQ1 | Embedding storage (Sec. 4: 8.8M passages, 67.5GB in float16) | `constbert/experiments/rq1/03_storage_analysis.py` | `constbert/results/03_storage_analysis.json` |
+| RQ2 | Table 2, MS MARCO, PLAID-4 | `rq2/build_plaid_index_msmarco.py`, `rq2/05_msmarco_plaid_eval.py` | `05_msmarco_plaid.json` |
+| RQ2 | Table 2, MS MARCO, PLAID-16 | `rq2/06_msmarco_plaid_ncells.py` | `06_msmarco_plaid_ncells16.json` |
+| RQ2 | Table 2, ToT, PLAID-16 | `rq2/build_plaid_index_tot.py`, `rq4/09_tot_plaid_eval.py` | `09_tot_plaid_ncells16.json` |
+| RQ2 | PLAID parameter search (Sec. 5.2.2) | `rq2/18_plaid_parameter_sweep.py` | `18_plaid_parameter_sweep.json` |
 | RQ2 | Centroid coverage (Sec. 5.2.3) | `rq2/17_centroid_coverage_analysis.py --num_docs 5000` | `17_centroid_coverage.json` |
 | RQ3 | Table 3, ConstBERT with PLAID | `rq3/12-1_build_beir_plaid_indices.py`, `rq3/12-2_build_ivf_for_beir.py`, `rq3/12-3_beir_plaid_eval.py` (see the note below) | `12_beir_plaid_<dataset>.json`, `12_beir_plaid_summary.json` |
 | RQ3 | Table 4, ConstBERT with FAISS-IVF | `rq3/11_beir_evaluation.py` | `11_beir_constbert_<dataset>.json`, `11_beir_constbert_summary.json` |
 | RQ3 | Means of Tables 3 and 4 | `rq3/compare_beir_backends.py`, run from inside `constbert/` | `12_beir_backend_comparison.json` |
 | RQ3 | Table 5, ColBERT-v2 | `rq3/13_beir_colbertv2_evaluation.py` | `13_beir_colbertv2_<dataset>.json`, `13_beir_colbertv2_summary.json` |
-| RQ4 | Tables 2 and 6, ConstBERT with FAISS-IVF on ToT | `rq4/04_tot_faiss_eval.py` (does not run to completion as committed, see [RQ4](#rq4-structural-generalization-trec-tot)) | `04_tot_faiss.json` |
+| RQ4 | Tables 2 and 6, ConstBERT with FAISS-IVF on ToT | `rq4/04_tot_faiss_eval.py` | `04_tot_faiss.json` |
 | RQ4 | Table 6, ColBERT-v2 on ToT | `rq5/eval_colbert_base_test.py` (needs a ColBERT-v2 ToT index, see [RQ4](#rq4-structural-generalization-trec-tot)) | `colbert_base_test.json` |
-| RQ4 | Table 7, query length ablation | `rq4/15_query_length_ablation.py` (needs a saved ToT FAISS index, see [RQ4](#rq4-structural-generalization-trec-tot)) | `15_query_length_ablation.json` |
-| RQ4 | Table 8, exact MaxSim | `rq4/16_exact_maxsim_tot.py` (does not run to completion as committed, see [RQ4](#rq4-structural-generalization-trec-tot)) | `16_exact_maxsim_tot.json` |
+| RQ4 | Table 7, query length ablation | `rq4/15_query_length_ablation.py` (uses the index saved by `04_tot_faiss_eval.py`) | `15_query_length_ablation.json` |
+| RQ4 | Table 8, exact MaxSim | `rq4/16_exact_maxsim_tot.py` (uses the embeddings saved by `04_tot_faiss_eval.py`) | `16_exact_maxsim_tot.json` |
 | RQ5 | Table 9, TEST rows of the fine-tuned models | `constbert/scripts/run_multiseed_finetuning.sh`, `rq5/eval_multiseed_tot.py`, `rq5/eval_multiseed_colbert.py` | `multiseed/constbert_seed*_eval.json`, `multiseed/colbert_seed*_eval.json` |
 | RQ5 | Fine-tuning with tripled training data (Sec. 5.5.1) | `rq5/run_ablation_constbert.py`, `rq5/run_ablation_colbert.py` | `14_ablation_constbert_finetune_summary.json`, `14_ablation_colbert_finetune_summary.json` |
 
-**Note on Table 3.** `12-3_beir_plaid_eval.py` picks its PLAID search settings from `k`. At `k = 1000` it uses PLAID's documented defaults (`ncells=4`). The paper's Table 3 uses `ncells = 16` (Sec. 5.3.1). Each per-dataset BEIR PLAID result file records the settings of its run. The script has no command-line flags for these settings, so to use the settings that a result file records, edit the `k`-based settings block in `12-3_beir_plaid_eval.py` before you re-run.
+**Note on Table 3.** `12-3_beir_plaid_eval.py` defaults to the PLAID settings that the Table 3 result files record, at `k = 1000`: `--ncells 16`, `--centroid_score_threshold 0.3` and `--ndocs 8192`. These defaults do not change with `--k`.
 
 ## Setup
 
@@ -199,9 +200,13 @@ python constbert/experiments/rq1/01_msmarco_faiss_eval.py
 # ConstBERT on TREC DL 2019 and 2020, using the index saved by the previous command
 python constbert/experiments/rq1/02_trec_dl_faiss_eval.py
 
+# Storage of the saved MS MARCO embeddings and indices. The default paths point to our
+# machine, so pass yours (see --help)
+python constbert/experiments/rq1/03_storage_analysis.py --embeddings <embeddings.npy> --faiss-index <index.faiss> --faiss-pkl <index.pkl> --plaid-index <plaid_index_dir>
+
 # ColBERT-v2 on MS MARCO dev (colbertv2 environment). Searches an existing ColBERT-v2 index,
-# indices/msmarco-passage-colbertv2 by default, then scores the ranking. The indexing wrappers
-# in colbertv2/scripts/ call index_colbertv2.py, which is not in this repository
+# indices/msmarco-passage-colbertv2 by default, then scores the ranking.
+# colbertv2/scripts/index_colbertv2_msmarco.sh builds that index with index_colbertv2.py
 bash colbertv2/scripts/run_eval_msmarco.sh
 python colbertv2/scripts/eval_msmarco_json.py data/msmarco-passage/qrels.dev.small.tsv colbertv2/results/msmarco_full.ranking.tsv
 ```
@@ -214,15 +219,6 @@ python colbertv2/scripts/eval_msmarco_json.py data/msmarco-passage/qrels.dev.sma
 # constbert_msmarco_faiss_index.pkl in the same folder, so copy or link the files that
 # 01_msmarco_faiss_eval.py saved (data/msmarco-passage/ and indices/) to that folder first
 python constbert/experiments/rq2/build_plaid_index_msmarco.py
-
-# Add the IVF files and metadata.json that ColBERT needs to load the index (see the note below)
-python - <<'PY'
-import importlib.util
-spec = importlib.util.spec_from_file_location("build_ivf", "constbert/experiments/rq3/12-2_build_ivf_for_beir.py")
-module = importlib.util.module_from_spec(spec)
-spec.loader.exec_module(module)
-module.build_ivf("indices/msmarco-passage/constbert_plaid_index")
-PY
 
 # PLAID with its documented defaults for k = 1000 (Table 2, PLAID-4)
 python constbert/experiments/rq2/05_msmarco_plaid_eval.py
@@ -238,7 +234,7 @@ python constbert/experiments/rq2/18_plaid_parameter_sweep.py
 python constbert/experiments/rq2/17_centroid_coverage_analysis.py --num_docs 5000
 ```
 
-**Note on RQ2.** `build_plaid_index_msmarco.py` does not write the IVF files (`ivf.pt` and `ivf.pid.pt`) or the `metadata.json` that ColBERT needs to load a PLAID index. Without them, `05_msmarco_plaid_eval.py`, `06_msmarco_plaid_ncells.py` and `18_plaid_parameter_sweep.py` stop with an `AssertionError` when they open the index. The `build_ivf()` function in `constbert/experiments/rq3/12-2_build_ivf_for_beir.py` writes these files. That script's command line accepts only BEIR dataset names, so the step above calls the function directly.
+**Note on RQ2.** `build_plaid_index_msmarco.py` ends by calling `build_ivf()` from `constbert/experiments/rq3/12-2_build_ivf_for_beir.py`, which writes the `ivf.pt`, `ivf.pid.pt` and `metadata.json` files that ColBERT needs to load a PLAID index. The PLAID builders train k-means and estimate residual statistics on random samples that are not seeded, so a rebuilt index will not reproduce the tracked result files exactly.
 
 ### RQ3: Domain Generalization (BEIR)
 
@@ -259,31 +255,19 @@ python constbert/experiments/rq3/13_beir_colbertv2_evaluation.py --all
 ### RQ4: Structural Generalization (TREC ToT)
 
 ```bash
-# ConstBERT with FAISS-IVF on ToT TEST (Tables 2 and 6). Encodes the corpus and saves
-# embeddings.npy and metadata.npy in indices/trec-tot-2025/constbert_tot_faiss_index/
-# (unless both exist), then stops before it scores anything (see the note below)
+# ConstBERT with FAISS-IVF on ToT TEST (Tables 2 and 6). Encodes the corpus and builds the
+# FAISS index, saving both in indices/trec-tot-2025/constbert_tot_faiss_index/ (each step is
+# skipped when its files already exist), then scores the TEST queries
 python constbert/experiments/rq4/04_tot_faiss_eval.py
 
-# ConstBERT with PLAID on ToT. The builder reads the embeddings saved above. ColBERT cannot load
-# the index it writes, so the evaluation stops when it opens the index (see the note below)
+# ConstBERT with PLAID on ToT. The builder reads the embeddings saved above
 python constbert/experiments/rq2/build_plaid_index_tot.py
 python constbert/experiments/rq4/09_tot_plaid_eval.py
 
-# Query length ablation (Table 7). The script loads a saved ToT FAISS index and does not build
-# one. The inline Python step builds and saves that index from the embeddings saved above
-python - <<'PY'
-import sys
-sys.path.insert(0, "constbert")
-import numpy as np, torch
-from models.faiss_index import ConstBERTFAISSIndex
-d = "indices/trec-tot-2025/constbert_tot_faiss_index/"
-index = ConstBERTFAISSIndex(use_gpu=torch.cuda.is_available())
-index.add_documents(np.load(d + "metadata.npy", allow_pickle=True), np.load(d + "embeddings.npy"))
-index.save(d + "index")
-PY
+# Query length ablation (Table 7). Loads the FAISS index saved above
 python constbert/experiments/rq4/15_query_length_ablation.py
 
-# Exact MaxSim (Table 8). Stops before it scores anything (see the note below)
+# Exact MaxSim (Table 8). Scores the embeddings saved above (see the note below)
 python constbert/experiments/rq4/16_exact_maxsim_tot.py
 
 # ColBERT-v2 zero-shot on ToT TEST. Searches an existing ColBERT-v2 ToT index at
@@ -293,10 +277,9 @@ python constbert/experiments/rq5/eval_colbert_base_test.py
 
 **Note on RQ4.**
 
-- `04_tot_faiss_eval.py` and `16_exact_maxsim_tot.py` do not run to completion as committed. The [Known Issues](constbert/README.md#known-issues) section of `constbert/README.md` explains why. Their tracked outputs are `constbert/results/04_tot_faiss.json` and `constbert/results/16_exact_maxsim_tot.json`.
-- `build_plaid_index_tot.py` does not write `avg_residual.pt`, `buckets.pt` or `metadata.json`, which ColBERT needs to load a PLAID index. So `09_tot_plaid_eval.py` stops with a `FileNotFoundError` when it opens an index built this way. Its tracked output is `constbert/results/09_tot_plaid_ncells16.json`.
-- `15_query_length_ablation.py` loads a saved ToT FAISS index (the files `index` and `index.faiss`) from `indices/trec-tot-2025/constbert_tot_faiss_index/`. `04_tot_faiss_eval.py` stops before it saves an index, and no other script in `constbert/experiments/rq4/` saves one. The inline Python step builds the index from the `embeddings.npy` and `metadata.npy` files that `04_tot_faiss_eval.py` saves in that folder, then writes `index` and `index.faiss`.
-- `eval_colbert_base_test.py` needs a ColBERT-v2 index of the ToT corpus and the ID map that `colbertv2/scripts/index_colbertv2_tot.sh` writes to `colbertv2/tmp/`. That wrapper then calls `index_colbertv2.py`, which is not in this repository, so no script here builds the index.
+- `16_exact_maxsim_tot.py` scores every one of the 6.4M stored document embeddings for each of its 100 sampled queries on CPU. It needs about 55 GB of RAM and runs for several hours.
+- `build_plaid_index_tot.py` samples randomly in the same way as the MS MARCO builder (see the note on RQ2), so a rebuilt ToT PLAID index will not reproduce `constbert/results/09_tot_plaid_ncells16.json` exactly.
+- `eval_colbert_base_test.py` needs a ColBERT-v2 index of the ToT corpus and the ID map that `colbertv2/scripts/index_colbertv2_tot.sh` writes to `colbertv2/tmp/`. That wrapper builds the index with `index_colbertv2.py`.
 
 ### RQ5: Adaptation Potential (Fine-Tuning on ToT)
 
@@ -318,13 +301,13 @@ The TEST rows of Table 9 come from three fine-tuning runs per model.
 - `constbert/scripts/run_multiseed_finetuning.sh` launches the runs. It changes into `constbert/` first, so its ConstBERT runs read the triples written above and the ToT corpus and TRAIN queries under `constbert/data/trec-tot-2025/`. Its ColBERT-v2 runs change into `colbertv2/` and read `indices/trec-tot-2025/trec-tot-2025-triple-bm25/train.triples` and the ToT files under `data/trec-tot-2025/` there, so check those paths first. The ColBERT-v2 training code is `colbertv2/scripts/train_colbert_tot_triples.py`, and `colbertv2/README.md` covers the ColBERT-v2 triple scripts.
 - `eval_multiseed_tot.py --model constbert --seed <seed>` and `eval_multiseed_colbert.py --seed <seed>` (both in `constbert/experiments/rq5/`) evaluate each run on TEST, and `eval_multiseed_tot.py --aggregate` summarizes both models.
 - `eval_multiseed_tot.py` skips a run whose result file already exists in `constbert/results/multiseed/`. `eval_multiseed_colbert.py` checks for its result file only after it has converted the checkpoint and found or built the index, and then returns the stored result. The tracked files are in that folder, so move them aside before you re-run.
-- `eval_multiseed_colbert.py` also needs a ColBERT-v2 index of each fine-tuned model. When one is missing, it calls `colbertv2/scripts/index_colbertv2_tot.sh` to build it, and that wrapper calls `index_colbertv2.py`, which is not in this repository.
+- `eval_multiseed_colbert.py` also needs a ColBERT-v2 index of each fine-tuned model. When one is missing, it calls `colbertv2/scripts/index_colbertv2_tot.sh` to build it.
 
 ## Result Files
 
 The JSON results of our runs are included:
 
-- `constbert/results/` (72 files, 6 of them in `multiseed/`): ConstBERT results, plus the ColBERT-v2 BEIR, ToT TEST, multi-seed and fine-tuning ablation results.
+- `constbert/results/` (73 files, 6 of them in `multiseed/`): ConstBERT results, plus the ColBERT-v2 BEIR, ToT TEST, multi-seed and fine-tuning ablation results.
 - `colbertv2/results/` (6 files): ColBERT-v2 MS MARCO and ToT runs.
 - `colbertv1/results/` (6 files): supplementary ColBERT-v1 results, not reported in the paper.
 

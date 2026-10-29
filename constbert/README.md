@@ -53,10 +53,10 @@ Out-of-domain evaluation on 13 BEIR datasets, for ConstBERT with FAISS-IVF and w
 
 Zero-shot evaluation of ConstBERT on the long narrative queries of TREC ToT 2025. The ColBERT-v2 ToT TEST run is `experiments/rq5/eval_colbert_base_test.py`.
 
-- `04_tot_faiss_eval.py`: ToT evaluation with FAISS-IVF (see [Known Issues](#known-issues))
+- `04_tot_faiss_eval.py`: ToT evaluation with FAISS-IVF. It saves the corpus embeddings (`embeddings.npy`, `metadata.npy`) and the FAISS index (`index`, `index.faiss`) in `indices/trec-tot-2025/constbert_tot_faiss_index/`, where the other ToT scripts read them, and reuses them when they exist.
 - `09_tot_plaid_eval.py`: ToT evaluation with PLAID
-- `15_query_length_ablation.py`: Query length ablation that truncates ToT queries to fixed word counts. It loads a saved `ConstBERTFAISSIndex` (the files `index` and `index.faiss`) from `indices/trec-tot-2025/constbert_tot_faiss_index/` and does not build one.
-- `16_exact_maxsim_tot.py`: Exact brute-force MaxSim on sampled ToT queries (see [Known Issues](#known-issues))
+- `15_query_length_ablation.py`: Query length ablation that truncates ToT queries to fixed word counts. It loads the FAISS index that `04_tot_faiss_eval.py` saves and does not build one.
+- `16_exact_maxsim_tot.py`: Exact brute-force MaxSim on 100 sampled ToT queries. It scores the stored embeddings of every document that `04_tot_faiss_eval.py` saves, on CPU, so it needs about 55 GB of RAM and runs for several hours.
 
 ### RQ5: Adaptation Potential (`experiments/rq5/`)
 
@@ -76,7 +76,7 @@ Fine-tunes ConstBERT and ColBERT-v2 on TREC ToT and evaluates the fine-tuned mod
 
 `scripts/` holds bash wrappers that call the experiment scripts above. Each wrapper changes into `constbert/` first, so relative paths such as `data/`, `indices/`, `checkpoints/`, `results/` and `logs/` resolve inside `constbert/`. The one exception is the ColBERT-v2 training step in `run_multiseed_finetuning.sh`, which runs from `colbertv2/`.
 
-The multi-seed ToT TEST evaluation runs through `run_multiseed_eval.sh` (ConstBERT) and `run_colbert_multiseed_eval.sh` (ColBERT-v2). Two wrappers do not finish their job (see [Known Issues](#known-issues)).
+The multi-seed ToT TEST evaluation runs through `run_multiseed_eval.sh` (ConstBERT) and `run_colbert_multiseed_eval.sh` (ColBERT-v2). Two wrappers need inputs that are not in the repository (see [Wrapper Notes](#wrapper-notes)).
 
 ## Data
 
@@ -100,14 +100,9 @@ See [Setup](../README.md#setup) in the top-level README for how to get these fil
 
 `results/` holds the JSON outputs for ConstBERT and for the ColBERT-v2 scripts marked above. `results/multiseed/` holds the ToT TEST evaluation of each of the three fine-tuning runs per model. Some files hold results that the paper does not report, such as `08_trec_dl_plaid_*.json`, `10_finetune-results_tot_test.json`, `11_beir_constbert_fever_nlist4096.json`, `12_beir_plaid_summary_nbit-4_threshold-0.4.json` and `14_beir_backend_comparison.json`.
 
-## Known Issues
+## Wrapper Notes
 
-Two RQ4 scripts do not run to completion as committed:
+Two wrappers in `scripts/` need inputs that are not in the repository, such as training triples or fine-tuned checkpoints:
 
-- `experiments/rq4/04_tot_faiss_eval.py` looks for `index.pkl` and `index.faiss`, but `ConstBERTFAISSIndex.save()` writes the pickle as `index`. So it treats an index saved by this repository as missing and tries to build one, and that build passes arguments that `models/faiss_index.py` does not accept. Its retrieval loop also unpacks the return value of `ConstBERTFAISSIndex.search()` in a form that raises a `ValueError`.
-- `experiments/rq4/16_exact_maxsim_tot.py` calls `TRECToTDataLoader.load_documents()`, which `data/tot_loader.py` does not define, so it stops with an `AttributeError` before it scores any document.
-
-Two wrappers in `scripts/` do not finish their job either:
-
-- `scripts/run_constbert_finetuning.sh` fine-tunes ConstBERT and saves the model to `constbert/checkpoints/constbert_tot_finetuned/`, then stops at its evaluation step. That step writes and runs `experiments/10_eval_finetuned_constbert.py`, which creates a `ConstBERTFAISSIndex` with arguments that `models/faiss_index.py` does not accept, so it ends with a `TypeError`. To evaluate the saved model, run `experiments/rq5/10_eval_finetuned_tot_test.py` from `constbert/`.
-- `scripts/eval_multiseed_models.sh` evaluates nothing. It passes flags that `10_eval_finetuned_tot_test.py` does not accept, hides the error and prints `(skipped - evaluation script needs update)`. Its ColBERT-v2 loop runs no command. The multi-seed evaluation runs through `run_multiseed_eval.sh` and `run_colbert_multiseed_eval.sh` instead. `eval_multiseed_tot.py` skips a run whose result file already exists in `results/multiseed/`, and the tracked result files are there. `eval_multiseed_colbert.py` looks for its result file only after two earlier steps. It converts the fine-tuned checkpoint in `colbertv2/models/`, which is not tracked, unless a converted copy already exists. Then it needs a ColBERT-v2 index of that model (see `colbertv2/README.md`). If either is missing, `run_colbert_multiseed_eval.sh` stops at its first run, even though the tracked result files are there.
+- `scripts/run_constbert_finetuning.sh` fine-tunes ConstBERT, saves the model to `constbert/checkpoints/constbert_tot_finetuned/` and then runs `experiments/rq5/10_eval_finetuned_tot_test.py --splits dev1 dev2 dev3 test`. The evaluator writes `results/finetune-results_tot_<split>.json`, so it leaves the tracked `10_finetune-results_tot_<split>.json` files alone. It loads the document embeddings (`embeddings.npy`, `metadata.npy`) and the FAISS index (`index`, `index.faiss`) from `indices/trec-tot-2025/constbert_tot_faiss_index/` and encodes only the queries with the fine-tuned model. If the embeddings are missing, it first encodes the whole corpus with the fine-tuned model and saves them there. That is the folder where `04_tot_faiss_eval.py` keeps the base-model embeddings for the other ToT scripts, so run `04_tot_faiss_eval.py` first. If the index is missing, it builds one from the embeddings and saves it there. If `checkpoints/constbert_tot_finetuned/model.safetensors` is missing, it encodes the queries with the base model. With `--test` or `--dry-run`, the wrapper still trains, but only for 50 steps on a small sample. It saves that model to `checkpoints/constbert_tot_finetuned_test/` and skips the evaluation, because the evaluator always reads `checkpoints/constbert_tot_finetuned/`.
+- `scripts/eval_multiseed_models.sh` runs `run_multiseed_eval.sh` and then `run_colbert_multiseed_eval.sh`. `eval_multiseed_tot.py` skips a run whose result file already exists in `results/multiseed/`, and the tracked result files are there. `eval_multiseed_colbert.py` looks for its result file only after two earlier steps. It converts the fine-tuned checkpoint in `colbertv2/models/`, which is not tracked, unless a converted copy already exists in `indices/trec-tot-2025/`. If neither exists, `run_colbert_multiseed_eval.sh` stops at its first run, even though the tracked result files are there. If the model's ColBERT-v2 index is missing from that folder, it builds one through `colbertv2/scripts/index_colbertv2_tot.sh` (see `colbertv2/README.md`).

@@ -1,0 +1,110 @@
+{
+  "description": "Storage of ConstBERT MS MARCO embeddings and indices, compared with the ConstBERT paper.",
+  "paper_claims": {
+    "this_paper_sec4_fp16_embeddings": "our float16 embeddings occupy 67.5GB",
+    "this_paper_sec4_msmarco_passages": "8.8M passages",
+    "constbert_paper_constbert32_index_gb": 11,
+    "constbert_paper_colbert_index_gb": 22
+  },
+  "embedding_matrix": {
+    "num_docs": 8841823,
+    "vectors_per_doc": 32,
+    "dim": 128,
+    "dtype": "float16",
+    "data_bytes": 72432214016,
+    "data_gib": 67.458,
+    "data_gb_decimal": 72.432,
+    "npy_file_bytes": 72432214144,
+    "npy_file_gib": 67.458
+  },
+  "theoretical": {
+    "float32": {
+      "bytes_per_value": 4,
+      "bytes_per_doc": 16384,
+      "total_bytes": 144864428032,
+      "total_gib": 134.916,
+      "total_gb_decimal": 144.864
+    },
+    "float16": {
+      "bytes_per_value": 2,
+      "bytes_per_doc": 8192,
+      "total_bytes": 72432214016,
+      "total_gib": 67.458,
+      "total_gb_decimal": 72.432
+    },
+    "int8": {
+      "bytes_per_value": 1,
+      "bytes_per_doc": 4096,
+      "total_bytes": 36216107008,
+      "total_gib": 33.729,
+      "total_gb_decimal": 36.216
+    }
+  },
+  "on_disk": {
+    "faiss_index_bytes": 147130064779,
+    "faiss_index_gib": 137.026,
+    "faiss_pkl_bytes": 72519551022,
+    "faiss_pkl_gib": 67.539,
+    "faiss_setup_total_bytes": 292081829945,
+    "faiss_setup_total_gib": 272.022,
+    "plaid_index_bytes": 7682915743,
+    "plaid_index_gib": 7.155,
+    "plaid_index_gb_decimal": 7.683,
+    "plaid_nbits": 1,
+    "plaid_num_partitions": 32768
+  },
+  "checks": {
+    "fp16_embeddings_gib_rounded_1dp": 67.5,
+    "matches_paper_67_5": true,
+    "unit_note": "67.5 is the GiB value. In decimal GB the matrix is about 72.4 GB.",
+    "num_docs_millions_rounded_1dp": 8.8
+  },
+  "provenance": {
+    "script": "constbert/experiments/rq1/03_storage_analysis.py",
+    "script_sha256": "01faa7e0d64c256b2ec7ea9ac3b4ef2cf556f26080b9af421e9bee0effbaaea3",
+    "command": "/home/ugdf8/anaconda3/envs/constbert/bin/python constbert/experiments/rq1/03_storage_analysis.py --output constbert/results/03_storage_analysis.json",
+    "conda_env": "constbert",
+    "git_head": "f71571bc13ecc451a22db538e977e068e353532d",
+    "script_git_status_at_run_time": "clean",
+    "timestamp_utc": "2026-10-29T17:36:15Z",
+    "hostname": "rs7fy1v94",
+    "random_seeds": null,
+    "inputs": {
+      "embeddings_npy": {
+        "path": "/media/12TB/shared/datasets/indices/msmarco-passage/msmarco-passage-constbert/constbert_msmarco_embeddings.npy",
+        "exists": true,
+        "size_bytes": 72432214144,
+        "mtime_utc": "2026-01-02T10:38:30Z"
+      },
+      "faiss_index": {
+        "path": "/media/12TB/shared/datasets/indices/msmarco-passage/msmarco-passage-constbert/constbert_msmarco_faiss_index.faiss",
+        "exists": true,
+        "size_bytes": 147130064779,
+        "mtime_utc": "2026-01-04T16:01:20Z"
+      },
+      "faiss_pkl": {
+        "path": "/media/12TB/shared/datasets/indices/msmarco-passage/msmarco-passage-constbert/constbert_msmarco_faiss_index.pkl",
+        "exists": true,
+        "size_bytes": 72519551022,
+        "mtime_utc": "2026-01-04T16:08:49Z"
+      },
+      "plaid_index_dir": {
+        "path": "/media/12TB/shared/datasets/indices/msmarco-passage/constbert_plaid_index",
+        "exists": true,
+        "is_dir": true,
+        "du_sb_bytes": 7682915743,
+        "mtime_utc": "2026-01-15T02:08:44Z"
+      },
+      "plaid_metadata_json": {
+        "path": "/media/12TB/shared/datasets/indices/msmarco-passage/constbert_plaid_index/metadata.json",
+        "exists": true,
+        "size_bytes": 198,
+        "mtime_utc": "2026-01-15T02:08:44Z"
+      }
+    },
+    "notes": [
+      "Large files are not hashed. Path, size and mtime are recorded instead.",
+      "The .npy file is memory mapped, so only its header is read."
+    ]
+  }
+}

@@ -14,8 +14,9 @@ The ColBERT-v2 BEIR wrapper `constbert/scripts/run_colbertv2_beir_evaluation.sh`
 
 | Script | Description |
 |--------|-------------|
-| `scripts/index_colbertv2_msmarco.sh` | Index MS MARCO with ColBERT-v2. Calls `scripts/index_colbertv2.py`, which is not in this repository. |
-| `scripts/index_colbertv2_tot.sh` | Index the TREC ToT corpus with ColBERT-v2. Converts a JSONL corpus to TSV, then calls `scripts/index_colbertv2.py`, which is not in this repository. |
+| `scripts/index_colbertv2_msmarco.sh` | Index MS MARCO with ColBERT-v2. Calls `scripts/index_colbertv2.py`. |
+| `scripts/index_colbertv2_tot.sh` | Index the TREC ToT corpus with ColBERT-v2. Converts a JSONL corpus to TSV, then calls `scripts/index_colbertv2.py`. |
+| `scripts/index_colbertv2.py` | Build a ColBERT-v2 index, then move it to `<indices_root>/<index_name>`. The two wrappers above call it and pass `--output-root` and `--indices-root`. When you run it directly, pass both, since their defaults point to folders on our machine. |
 | `scripts/run_eval_msmarco.sh` | Search MS MARCO dev queries with `run_search.py`, then score the ranking with the ColBERT codebase's MS MARCO evaluator (`python -m utility.evaluate.msmarco_passages`) |
 | `scripts/eval_msmarco_json.py` | Score an MS MARCO ranking against qrels and write the metrics as JSON. Usage: `eval_msmarco_json.py <qrels> <ranking> [out.json]`. The default output path, `colbertv2/results/msmarco_eval_metrics.json`, is relative to the working directory, so run it from the repository root or pass the output path. |
 | `scripts/run_eval_tot.sh` | Search a TREC ToT split with `run_search.py` and compute TREC metrics. Defaults to DEV1 and the base checkpoint. It takes optional positional arguments in the order of its usage line: index, queries, qrels, output ranking, k, checkpoint and collection. |
@@ -32,7 +33,9 @@ The ColBERT-v2 BEIR wrapper `constbert/scripts/run_colbertv2_beir_evaluation.sh`
 
 With a JSONL query file (the default), `run_eval_tot.sh` converts the queries to TSV with new ids 0, 1, 2 and so on, so its run file uses those ids. Only the `compute_trec_metrics.py` fallback maps them back to the ToT query ids. `trec_eval` and `pytrec_eval` score the run as written, against qrels that use the ToT ids. If either one is available, pass a TSV query file that keeps the ToT ids, which `convert_jsonl_to_tsv.py --use-original-pid` writes.
 
-Because `scripts/index_colbertv2.py` is missing, no script in this repository builds the MS MARCO or ToT ColBERT-v2 index. `run_eval_msmarco.sh`, `run_eval_tot.sh`, `constbert/experiments/rq5/eval_colbert_base_test.py` and `constbert/experiments/rq5/eval_multiseed_colbert.py` need such an index. `eval_multiseed_colbert.py` also needs each fine-tuned checkpoint in `colbertv2/models/`, which is not tracked, unless a converted copy already exists. It then calls `index_colbertv2_tot.sh` itself and stops with an error when a model's index is not already built. It does both before it looks for its tracked result file in `constbert/results/multiseed/`.
+`run_eval_msmarco.sh`, `run_eval_tot.sh`, `constbert/experiments/rq5/eval_colbert_base_test.py` and `constbert/experiments/rq5/eval_multiseed_colbert.py` need a ColBERT-v2 index, which the two indexing wrappers build. `eval_multiseed_colbert.py` also needs each fine-tuned checkpoint in `colbertv2/models/`, which is not tracked, unless a converted copy already exists. When a model's index is missing, it calls `index_colbertv2_tot.sh` itself to build it. It does both before it looks for its tracked result file in `constbert/results/multiseed/`.
+
+ColBERT compiles its CUDA extensions the first time it needs them. The `colbertv2` environment's own `nvcc` (CUDA 11.7) cannot build them for newer GPUs such as the RTX 6000 Ada, so set `CUDA_HOME` to a newer CUDA toolkit (CUDA 12.6 works). The build also needs `ninja`, which is in the environment's `bin/` folder, so activate the environment or put that folder on `PATH`.
 
 ## ToT Data Paths
 
