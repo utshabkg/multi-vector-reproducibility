@@ -3,7 +3,7 @@
 Exact MaxSim Upper Bound on ToT
 
 Computes exact MaxSim scores (no approximation) to establish architectural upper bound.
-Uses BM25 top-100 candidates for computational feasibility.
+Scores every document in the corpus for a random sample of TEST queries.
 
 If Exact ≈ FAISS/PLAID, the problem is architectural (MaxSim).
 If Exact >> FAISS/PLAID, the problem is approximation quality.
@@ -34,41 +34,6 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-def load_bm25_candidates(qrels_path: str, top_k: int = 100) -> Dict[str, List[str]]:
-    """
-    Load BM25 candidate pool from qrels.
-    For efficiency, we use the top-100 BM25 candidates per query.
-    """
-    # For ToT, we'll use the full corpus as candidates (filtered by qrels for speed)
-    # In practice, BM25 would be pre-computed, but for simplicity we use qrels
-    candidates = {}
-    
-    loader = TRECToTDataLoader()
-    qrels = loader.load_qrels("test")
-    
-    # For each query, get relevant docs + sample of non-relevant
-    # This simulates BM25 top-100 pool
-    all_docs = loader.load_documents()
-    doc_ids = list(all_docs.keys())
-    
-    np.random.seed(42)
-    
-    for qid in qrels.keys():
-        # Get relevant docs
-        relevant = [did for did, rel in qrels[qid].items() if rel > 0]
-        
-        # Sample 100 docs total (including relevant)
-        if len(relevant) >= top_k:
-            candidates[qid] = relevant[:top_k]
-        else:
-            # Add random non-relevant docs
-            non_relevant = [did for did in doc_ids if did not in qrels[qid]]
-            sampled = np.random.choice(non_relevant, size=top_k - len(relevant), replace=False)
-            candidates[qid] = relevant + list(sampled)
-    
-    return candidates
-
-
 def compute_exact_maxsim(Q: torch.Tensor, D: torch.Tensor) -> float:
     """
     Compute exact MaxSim score between query Q and document D.
@@ -96,10 +61,8 @@ def run_exact_maxsim_evaluation(num_queries: int = 100, seed: int = 42):
     """
     Run exact MaxSim evaluation on ToT.
     
-    For computational feasibility:
-    - Sample N queries
-    - Use BM25 top-100 candidates per query
-    - Compute exact MaxSim (no approximation)
+    For computational feasibility, sample N queries. Each one is scored against
+    every document with exact MaxSim (no approximation).
     """
     
     logger.info("=" * 60)
@@ -152,9 +115,6 @@ def run_exact_maxsim_evaluation(num_queries: int = 100, seed: int = 42):
     D_all = torch.from_numpy(embeddings)  # (num_docs, 32, 128)
     
     logger.info(f"  Document embeddings: {D_all.shape}")
-    
-    # Create doc_id to index mapping
-    doc_id_to_idx = {did: idx for idx, did in enumerate(doc_ids)}
     
     # Run exact MaxSim retrieval
     logger.info(f"\n[4/4] Computing exact MaxSim scores...")
